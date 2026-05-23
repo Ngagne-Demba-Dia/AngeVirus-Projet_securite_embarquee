@@ -1,0 +1,1524 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cours magistral de securite embarquee | Ngagne Demba Dia</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #526070;
+      --paper: #f5f7fa;
+      --panel: #ffffff;
+      --line: #d6dee8;
+      --navy: #0f2437;
+      --cyan: #0e7490;
+      --green: #166534;
+      --gold: #a16207;
+      --red: #991b1b;
+      --violet: #5b21b6;
+      --code: #111827;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(140deg, rgba(14,116,144,.10), transparent 38%),
+        linear-gradient(320deg, rgba(22,101,52,.09), transparent 34%),
+        var(--paper);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    .cover {
+      min-height: 94vh;
+      display: grid;
+      align-items: center;
+      padding: 56px 7vw 38px;
+      color: #f8fbff;
+      background:
+        linear-gradient(rgba(7,18,32,.86), rgba(7,18,32,.86)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.055) 0 1px, transparent 1px 32px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 32px),
+        linear-gradient(120deg, #08111f 0%, #123047 46%, #173d45 100%);
+      border-bottom: 1px solid #21394b;
+    }
+
+    .cover-inner { max-width: 1120px; position: relative; }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 11px;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      color: #b8eef9;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      max-width: 980px;
+      margin: 22px 0 14px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin: 0 0 28px;
+      color: #d7e7ef;
+      font-size: 21px;
+    }
+
+    .identity {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      max-width: 920px;
+      margin-top: 40px;
+    }
+
+    .identity div {
+      min-height: 74px;
+      border-left: 3px solid #22d3ee;
+      background: rgba(255,255,255,.065);
+      padding: 12px 14px;
+    }
+
+    .identity strong { display: block; color: #fff; font-size: 16px; }
+    .identity span { color: #cdd9e5; }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 38px 24px 78px;
+    }
+
+    .toc, section {
+      background: rgba(255,255,255,.91);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 12px 28px rgba(17,24,39,.055);
+    }
+
+    .toc {
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .toc ol {
+      columns: 2;
+      gap: 44px;
+      margin: 0;
+      padding-left: 24px;
+    }
+
+    section {
+      padding: 28px;
+      margin: 24px 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: #10283a;
+      font-size: 30px;
+      line-height: 1.18;
+    }
+
+    h3 {
+      margin: 28px 0 8px;
+      color: #12313f;
+      font-size: 21px;
+    }
+
+    h4 { margin: 18px 0 6px; color: #1d3343; }
+
+    p { margin: 10px 0; }
+    a { color: #075985; }
+
+    .lead {
+      color: #263747;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 18px 0;
+    }
+
+    .tile {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .tile strong {
+      display: block;
+      color: var(--cyan);
+      margin-bottom: 5px;
+    }
+
+    .note, .warning, .formula, .lab, .sourcebox {
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin: 18px 0;
+    }
+
+    .note {
+      background: #ecfeff;
+      border-left: 5px solid var(--cyan);
+    }
+
+    .warning {
+      background: #fff1f2;
+      border-left: 5px solid var(--red);
+    }
+
+    .formula {
+      background: #f0fdf4;
+      border-left: 5px solid var(--green);
+      font-family: Georgia, serif;
+    }
+
+    .lab {
+      background: #fff7ed;
+      border-left: 5px solid var(--gold);
+    }
+
+    .sourcebox {
+      background: #f5f3ff;
+      border-left: 5px solid var(--violet);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #e9f5f8;
+      text-align: left;
+      color: #102d3a;
+    }
+
+    code {
+      background: #edf3f7;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    pre {
+      overflow-x: auto;
+      background: var(--code);
+      color: #edf5ff;
+      border-radius: 8px;
+      border: 1px solid #263548;
+      padding: 18px;
+      font-size: 13px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      align-items: center;
+      margin: 18px 0;
+    }
+
+    .box {
+      min-height: 72px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid #b8dce6;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fdff;
+      color: #12313f;
+      font-weight: 700;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-block;
+      margin: 4px 6px 4px 0;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #eef7fa;
+      border: 1px solid #cfe5ec;
+      color: #16404d;
+      font-size: 13px;
+    }
+
+    .small { color: var(--muted); font-size: 13px; }
+
+    .footer {
+      margin-top: 34px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+      .toc ol { columns: 1; }
+      .pipeline { grid-template-columns: 1fr; }
+      .arrow { display: none; }
+      section { padding: 20px; }
+      .cover { padding: 42px 24px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .cover {
+        min-height: auto;
+        color: #111;
+        background: #fff;
+        border-bottom: 2px solid #111;
+      }
+      .subtitle, .identity span { color: #333; }
+      .toc, section { box-shadow: none; break-inside: avoid; }
+      a { color: #111; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="cover">
+    <div class="cover-inner">
+      <span class="eyebrow">Securite materielle | Systemes embarques | Cryptographie appliquee</span>
+      <h1>Cours magistral de securite embarquee et materielle</h1>
+      <p class="subtitle">Un support structure comme un vrai cours de master : definitions, modeles de menace, formules, methodes d'attaque, schemas d'analyse, exemples concrets et contre-mesures pour AES, DES, RSA, ECC et les systemes embarques modernes.</p>
+      <div class="identity">
+        <div><strong>Ngagne Demba Dia</strong><span>Master Securite des Systemes Embarques</span></div>
+        <div><strong>UCAD</strong><span>Universite Cheikh Anta Diop</span></div>
+        <div><strong>Corpus local</strong><span>PDF du dossier doc_linuc_embarquee + traces du workspace</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <nav class="toc">
+      <h2>Plan du cours</h2>
+      <ol>
+        <li><a href="#intro">Vision generale</a></li>
+        <li><a href="#formalisme">Cadre formel et vocabulaire</a></li>
+        <li><a href="#menace">Modele de menace materiel</a></li>
+        <li><a href="#crypto">Bases crypto pour embarque</a></li>
+        <li><a href="#aesdes">DES, AES et modes</a></li>
+        <li><a href="#rsaecc">RSA, DH, ECC et signatures</a></li>
+        <li><a href="#sidechannel">Side-channel attacks</a></li>
+        <li><a href="#methodologie">Methodologie complete d'une attaque</a></li>
+        <li><a href="#power">SPA, DPA, CPA et templates</a></li>
+        <li><a href="#fault">Fault injection</a></li>
+        <li><a href="#debug">Debug, boot et secrets</a></li>
+        <li><a href="#secureboot">Secure boot et mise a jour</a></li>
+        <li><a href="#puftrng">PUF, TRNG et stockage de cles</a></li>
+        <li><a href="#fpga">FPGA, ASIC, DFT et scan chains</a></li>
+        <li><a href="#trojan">Hardware trojans</a></li>
+        <li><a href="#linux">Linux embarque et supply chain</a></li>
+        <li><a href="#contre">Contre-mesures globales</a></li>
+        <li><a href="#projets">Projets (voir fichier separe)</a></li>
+        <li><a href="#audit">Checklist d'audit</a></li>
+        <li><a href="#sources">Notes de lecture PDF</a></li>
+        <li><a href="#em_analysis">Analyse EM et EMFI</a></li>
+        <li><a href="#masking_ho">Masking superieur et TVLA</a></li>
+        <li><a href="#certification">Certification CC et FIPS 140-3</a></li>
+        <li><a href="#obfuscation">Obfuscation materielle et protection IP</a></li>
+      </ol>
+    </nav>
+
+    <section id="intro">
+      <h2>1. Vision generale de la securite materielle</h2>
+      <p class="lead">La securite materielle etudie ce qui se passe quand la cryptographie, le logiciel et les secrets vivent dans un objet physique : microcontroleur, SoC, FPGA, carte bancaire, objet IoT, routeur, telephone, module medical, calculateur automobile ou carte de developpement.</p>
+
+      <p>Un algorithme peut etre mathematiquement robuste et son systeme quand meme vulnerable. La faille peut venir d'un temps d'execution variable, d'une consommation electrique dependante des bits secrets, d'un port JTAG mal verrouille, d'une cle stockee en clair dans la flash, d'un bootloader qui accepte un firmware non signe, d'un FPGA dont le bitstream est copiable, ou d'une dependance logicielle compromise dans la chaine de build.</p>
+
+      <div class="grid">
+        <div class="tile"><strong>Objectif defensif</strong> Concevoir un systeme qui protege ses secrets, son code, son execution et son identite meme face a un attaquant local ou physique.</div>
+        <div class="tile"><strong>Objectif offensif ethique</strong> Mesurer les fuites, demontrer les risques sur banc autorise, puis proposer des corrections testables.</div>
+        <div class="tile"><strong>Frontiere importante</strong> La securite ne s'arrete pas a l'algorithme. Elle inclut implementation, packaging, fabrication, debug, boot, mise a jour, exploitation et maintenance.</div>
+      </div>
+
+      <h3>Les grandes surfaces d'attaque</h3>
+      <table>
+        <thead>
+          <tr><th>Surface</th><th>Question de securite</th><th>Exemple d'attaque</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Physique</td><td>Que peut observer ou modifier un attaquant avec acces a la carte ?</td><td>Mesure de puissance, sonde EM, glitch tension/horloge, decapsulation.</td></tr>
+          <tr><td>Microarchitecture</td><td>Le CPU fuit-il via cache, branchements, speculation, TLB ?</td><td>Flush+Reload, Prime+Probe, timing sur tables AES.</td></tr>
+          <tr><td>Firmware</td><td>Le code est-il authentifie, chiffre, anti-rollback ?</td><td>Injection d'un firmware ancien ou modifie.</td></tr>
+          <tr><td>Debug</td><td>JTAG/SWD/UART restent-ils accessibles ?</td><td>Dump flash, halt CPU, lecture RAM, modification de boot.</td></tr>
+          <tr><td>Fabrication</td><td>Peut-on inserer, remplacer ou cloner un composant ?</td><td>Hardware trojan, counterfeit IC, IP piracy.</td></tr>
+          <tr><td>Logiciel embarque</td><td>Les dependances et outils de build sont-ils fiables ?</td><td>Compromission d'une bibliotheque transitive ou d'un paquet.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="formalisme">
+      <h2>2. Cadre formel et vocabulaire de la securite materielle</h2>
+      <p>Pour travailler proprement, on distingue trois niveaux. Le premier est l'algo mathematique, par exemple AES ou RSA. Le deuxieme est l'implementation, par exemple un code C, une RTL ou un microcode. Le troisieme est le systeme physique, c'est-a-dire la puce, le PCB, l'alimentation, les capteurs, les bus et les interfaces de debug.</p>
+
+      <div class="pipeline">
+        <div class="box">Algorithme</div>
+        <div class="arrow">-></div>
+        <div class="box">Implementation</div>
+        <div class="arrow">-></div>
+        <div class="box">Plateforme physique</div>
+        <div class="arrow">-></div>
+        <div class="box">Fuite observable</div>
+      </div>
+
+      <h3>Modele de fuite</h3>
+      <p>On note souvent la fuite mesuree sur une trace au temps t par une fonction du type :</p>
+      <div class="formula">
+        L(t) = a · f(x, k, t) + b + n(t)
+      </div>
+      <p>ou <code>x</code> est le texte clair ou le challenge, <code>k</code> la cle, <code>f</code> la quantite intermediaire sensible, <code>a</code> un facteur d'echelle, <code>b</code> un offset et <code>n(t)</code> le bruit de mesure.</p>
+
+      <h3>Trois grandeurs utiles</h3>
+      <table>
+        <thead>
+          <tr><th>Grandeur</th><th>Definition</th><th>Utilite</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SNR</td><td>Rapport signal sur bruit entre la partie utile et la variance parasite.</td><td>Comparer deux configurations ou deux contre-mesures.</td></tr>
+          <tr><td>Correlation</td><td>Mesure du lien entre la prediction de fuite et les traces observees.</td><td>Base de la CPA et du classement des hypotheses.</td></tr>
+          <tr><td>t-test TVLA</td><td>Test statistique pour verifier si deux ensembles de traces sont distinguables.</td><td>Evaluer si une implementation fuit potentiellement.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="formula">
+        r = cov(X, Y) / (σ_X · σ_Y)
+      </div>
+      <div class="formula">
+        t = (μ_1 - μ_2) / sqrt(s_1²/n_1 + s_2²/n_2)
+      </div>
+
+      <h3>Lecture d'une attaque</h3>
+      <ol>
+        <li>On choisit un point sensible : par exemple la sortie de la S-box AES ou une multiplication scalaire ECC.</li>
+        <li>On calcule une variable intermediaire candidate pour chaque hypothese de cle.</li>
+        <li>On compare la prediction au signal mesure avec correlation, difference de moyennes ou classification.</li>
+        <li>On retient les hypotheses dominantes puis on valide sur un second lot de traces.</li>
+      </ol>
+
+      <div class="sourcebox">
+        <strong>Exemple simple :</strong> pour AES, une hypothese sur un octet de cle produit une valeur intermediaire <code>v = Sbox[p XOR k]</code>. Si la consommation suit une distance ou une quantite proportionnelle aux bits a 1 de <code>v</code>, la bonne hypothese remonte statistiquement plus haut que les autres.
+      </div>
+    </section>
+
+    <section id="menace">
+      <h2>2. Modele de menace materiel</h2>
+      <p>Un modele de menace de securite materielle doit dire qui attaque, ce qu'il possede, ce qu'il sait, combien de temps il a, et ce qu'il peut detruire. Sans cela, le mot "securise" ne veut rien dire.</p>
+
+      <h3>Niveaux d'attaquant</h3>
+      <table>
+        <thead>
+          <tr><th>Niveau</th><th>Capacites</th><th>Exemples</th><th>Defense attendue</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Distant</td><td>Paquets reseau, API, mises a jour</td><td>Firmware malveillant, exploitation service</td><td>Authentification, chiffrement, secure update</td></tr>
+          <tr><td>Local logiciel</td><td>Processus sur meme machine</td><td>Cache attacks, escalation de privileges</td><td>Isolation, constant-time, durcissement OS</td></tr>
+          <tr><td>Local physique simple</td><td>Acces aux connecteurs, flash externe, UART</td><td>Dump SPI flash, console root</td><td>Secure boot, chiffrement flash, verrouillage debug</td></tr>
+          <tr><td>Laboratoire</td><td>Oscilloscope, sonde EM, glitcher, microscope</td><td>DPA, EMFI, voltage glitch</td><td>Masking, detection de fautes, blindage, tests TVLA</td></tr>
+          <tr><td>Invasif</td><td>Decapsulation, microprobing, FIB</td><td>Lecture bus interne, modification metal</td><td>Tamper resistance, zeroization, packaging securise</td></tr>
+          <tr><td>Supply chain</td><td>Fournisseur, fab, dependance, build system</td><td>Hardware trojan, paquet compromis</td><td>SBOM/HBOM, provenance, audits, tests, diversification</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>Principe utile :</strong> plus l'attaquant est proche physiquement, plus il faut proteger les secrets contre l'observation et la perturbation, pas seulement contre la lecture logique.
+      </div>
+
+      <h3>Actifs a proteger</h3>
+      <ul>
+        <li>Clefs cryptographiques : cle de boot, cle de chiffrement flash, cle TLS, cle ECDSA de signature.</li>
+        <li>Firmware et configuration : bootloader, kernel, device tree, fichiers de calibration, politiques de securite.</li>
+        <li>Identite de l'equipement : certificats, serial, identifiants de production.</li>
+        <li>Propriete intellectuelle : bitstream FPGA, RTL, microcode, algorithmes proprietaires.</li>
+        <li>Disponibilite et surete : le systeme ne doit pas seulement cacher un secret, il doit rester dans un etat sur.</li>
+      </ul>
+    </section>
+
+    <section id="crypto">
+      <h2>3. Bases cryptographiques utiles en embarque</h2>
+      <p>Le livre <em>Understanding Cryptography</em> de Christof Paar et Jan Pelzl donne la base mathematique et pratique : chiffrement symetrique, chiffrement asymetrique, signatures, fonctions de hachage et etablissement de cles. En securite materielle, on ajoute une question : comment ces primitives sont-elles implementees dans une puce reelle ?</p>
+
+      <h3>Primitives essentielles</h3>
+      <table>
+        <thead>
+          <tr><th>Primitive</th><th>Role</th><th>Usage embarque</th><th>Risque d'implementation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>AES</td><td>Chiffrement symetrique bloc</td><td>Flash encryption, TLS, stockage, bus securise</td><td>CPA/DPA sur S-box, cache attacks sur tables</td></tr>
+          <tr><td>Hash SHA-2/SHA-3</td><td>Empreinte, integrite</td><td>Mesure de firmware, signatures, KDF</td><td>Erreur de mode, collision si algo obsolete</td></tr>
+          <tr><td>HMAC/CMAC/GMAC</td><td>Authentification de message</td><td>Secure update, messages CAN/IoT</td><td>Comparaison non constante, cle mal protegee</td></tr>
+          <tr><td>RSA/ECC</td><td>Signature, echange de cles</td><td>Secure boot, TLS, attestation</td><td>Timing, fautes RSA-CRT, nonce ECDSA fuitant</td></tr>
+          <tr><td>TRNG/DRBG</td><td>Alea cryptographique</td><td>Nonce, cle, masques side-channel</td><td>Alea faible, health tests absents</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Regles de conception</h3>
+      <ul>
+        <li>Ne jamais inventer son propre algorithme cryptographique pour un produit reel.</li>
+        <li>Separer les usages de cles : une cle de boot ne doit pas servir au chiffrement donnees.</li>
+        <li>Authentifier avant d'executer : un firmware chiffre mais non signe peut rester dangereux.</li>
+        <li>Proteger les cles au repos, en transit et pendant le calcul.</li>
+        <li>Choisir les modes modernes : GCM, CCM, SIV ou encrypt-then-MAC selon le contexte.</li>
+      </ul>
+    </section>
+
+    <section id="aesdes">
+      <h2>4. DES, AES et modes d'operation</h2>
+
+      <h3>DES : utile pour apprendre, obsolete pour proteger</h3>
+      <p>DES est un chiffrement par bloc de 64 bits construit comme un reseau de Feistel a 16 tours. Il illustre tres bien les notions de confusion et diffusion : les S-boxes creent la non-linearite, les permutations diffusent les bits. Sa cle effective de 56 bits est aujourd'hui beaucoup trop courte, ce qui explique son abandon pour les usages modernes.</p>
+
+      <div class="sourcebox">
+        <strong>Apport du livre de Paar/Pelzl :</strong> DES sert de modele pedagogique pour comprendre Feistel, S-boxes, key schedule, recherche exhaustive, cryptanalyse lineaire/differentielle et remplacement progressif par AES/3DES.
+      </div>
+
+      <h3>AES : standard moderne, mais implementation sensible</h3>
+      <p>AES chiffre des blocs de 128 bits avec des cles de 128, 192 ou 256 bits. Sa structure est un reseau substitution-permutation : <code>SubBytes</code>, <code>ShiftRows</code>, <code>MixColumns</code>, <code>AddRoundKey</code>. Pour les attaques side-channel, le point le plus classique est la sortie de la S-box du premier tour :</p>
+
+      <div class="formula">
+        Valeur cible CPA AES : V_i(k) = Sbox[P_i XOR k]. Pour chaque octet de cle, on teste 256 hypotheses et on cherche celle dont le modele de fuite correspond le mieux aux traces mesurees.
+      </div>
+
+      <h3>Modes d'operation</h3>
+      <table>
+        <thead>
+          <tr><th>Mode</th><th>Propriete</th><th>Usage</th><th>Attention</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ECB</td><td>Chiffre chaque bloc independamment</td><td>Presque jamais recommande</td><td>Revele les motifs, substitution de blocs</td></tr>
+          <tr><td>CBC</td><td>Chaine les blocs avec IV</td><td>Legacy, stockage ancien</td><td>Besoin de padding sur, MAC separe</td></tr>
+          <tr><td>CTR</td><td>Transforme AES en flux</td><td>Embarque rapide, parallelisable</td><td>Nonce/compteur jamais reutilise</td></tr>
+          <tr><td>GCM</td><td>Confidentialite + integrite</td><td>TLS, stockage, messages</td><td>Nonce unique obligatoire</td></tr>
+          <tr><td>CCM</td><td>CTR + CBC-MAC</td><td>IoT, BLE, 802.15.4</td><td>Parametrage plus contraignant</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warning">
+        <strong>Erreur classique :</strong> chiffrer un firmware sans signature ne suffit pas. Le chiffrement cache le contenu, mais seule l'authentification dit que le code vient d'une autorite legitime et n'a pas ete modifie.
+      </div>
+    </section>
+
+    <section id="rsaecc">
+      <h2>5. RSA, Diffie-Hellman, ECC et signatures</h2>
+
+      <h3>RSA</h3>
+      <p>RSA repose sur la difficulte de factoriser un module <code>N = p*q</code>. En embarque, RSA est surtout utilise pour les signatures de firmware ou TLS legacy. Le calcul coute cher : exponentiation modulaire sur grands entiers, optimisations CRT, Montgomery, fenetrage. Ces optimisations sont utiles, mais elles ouvrent aussi des surfaces timing et fault injection.</p>
+
+      <h3>Diffie-Hellman et ECDH</h3>
+      <p>Diffie-Hellman permet d'etablir une cle de session sur un canal public. Sa version elliptique, ECDH, est tres populaire en embarque car elle offre une securite forte avec des cles plus courtes que RSA classique. Mais l'authenticite reste necessaire : sans certificats, cle publique preinstallee ou attestation, l'echange est vulnerable a l'homme-du-milieu.</p>
+
+      <h3>ECC et ECDSA</h3>
+      <p>ECC manipule des points sur courbe elliptique. L'operation centrale est la multiplication scalaire <code>Q = kP</code>. Si l'implementation double-and-add fuit la difference entre doublement et addition, le scalaire secret peut se reveler. Pour ECDSA, le nonce de signature est critique : s'il est reutilise, biaise ou partiellement fuitant, la cle privee peut etre retrouvee.</p>
+
+      <table>
+        <thead>
+          <tr><th>Primitive</th><th>Operation sensible</th><th>Attaques</th><th>Contre-mesures</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>RSA</td><td>Exponentiation, CRT</td><td>Timing, SPA, fault RSA-CRT</td><td>Blinding, constant-time, verification signature avant sortie</td></tr>
+          <tr><td>DH</td><td>Exponentiation modulaire</td><td>Timing, petits sous-groupes, MITM</td><td>Validation parametres, blinding, certificats</td></tr>
+          <tr><td>ECC/ECDH</td><td>Multiplication scalaire</td><td>SPA, timing, cache, fautes</td><td>Montgomery ladder, formules unifiees, validation de points</td></tr>
+          <tr><td>ECDSA</td><td>Nonce ephemere</td><td>Nonce reuse, nonce leakage, fault</td><td>RFC 6979 ou TRNG solide, protection du calcul, verification</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="sidechannel">
+      <h2>6. Side-channel attacks</h2>
+      <p class="lead">Une attaque side-channel n'attaque pas l'algorithme abstrait. Elle observe une fuite produite par son implementation : temps, puissance, rayonnement electromagnetique, cache, bruit, temperature, erreurs ou comportement reseau.</p>
+
+      <div class="pipeline">
+        <div class="box">Secret</div>
+        <div class="arrow">-></div>
+        <div class="box">Calcul physique</div>
+        <div class="arrow">-></div>
+        <div class="box">Fuite mesurable</div>
+        <div class="arrow">-></div>
+        <div class="box">Inference statistique</div>
+      </div>
+
+      <h3>Familles</h3>
+      <table>
+        <thead>
+          <tr><th>Famille</th><th>Signal observe</th><th>Exemple</th><th>Cible typique</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Timing</td><td>Duree d'une operation</td><td>RSA non constant-time</td><td>Exposant, cle, branche secret</td></tr>
+          <tr><td>Power</td><td>Courant/alimentation</td><td>CPA AES</td><td>Octets de cle</td></tr>
+          <tr><td>EM</td><td>Rayonnement local</td><td>Sonde proche de la puce</td><td>Operation localisee</td></tr>
+          <tr><td>Cache</td><td>Temps d'acces memoire</td><td>Flush+Reload sur tables</td><td>Index secret, S-box</td></tr>
+          <tr><td>Acoustique/thermique/optique</td><td>Bruit, chaleur, LED</td><td>Fuite visuelle ou capteur</td><td>Activite, etat interne</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Timing attacks selon Kocher</h3>
+      <p>Le papier de Kocher sur les timing attacks montre qu'un attaquant peut retrouver des informations sur les exposants secrets de RSA, Diffie-Hellman ou DSS si le temps d'execution varie selon les bits du secret. L'attaque se formalise comme un probleme de detection de signal : le temps contient une petite composante liee au secret et beaucoup de bruit. Avec assez de mesures, la composante utile devient visible.</p>
+
+      <div class="note">
+        <strong>Lecon importante :</strong> ajouter des delais aleatoires augmente le nombre de mesures necessaires, mais ne supprime pas la fuite. Une vraie defense timing cherche l'execution constante et l'absence d'acces memoire dependant du secret.
+      </div>
+    </section>
+
+    <section id="methodologie">
+      <h2>6bis. Methodologie complete d'une attaque side-channel</h2>
+      <p>Une attaque side-channel serieuse suit presque toujours la meme logique. On ne commence pas par "casser la cle", on commence par comprendre ou la puce fuit, combien elle fuit, et sous quelle forme statistique cette fuite devient exploitable.</p>
+
+      <h3>Cycle d'attaque</h3>
+      <div class="grid">
+        <div class="tile"><strong>1. Cibler</strong> Choisir l'algorithme, l'etape interne et la cle visee : AES premier tour, RSA-CRT, multiplication scalaire ECC, verification de signature, etc.</div>
+        <div class="tile"><strong>2. Observer</strong> Capturer des traces ou des timings en gardant les parametres stables : textes clairs, frequences, synchronisation, temperature et alimentation.</div>
+        <div class="tile"><strong>3. Nettoyer</strong> Aligner les traces, retirer les derives, filtrer le bruit, normaliser et verifier que le point d'interet est visible.</div>
+        <div class="tile"><strong>4. Modeler</strong> Choisir le modele de fuite : Hamming Weight, Hamming Distance, timing variable, cache access, classe statistique, template, ou modele appris.</div>
+        <div class="tile"><strong>5. Tester</strong> Calculer la statistique d'attaque et classer les hypotheses de cles jusqu'a obtenir un rang 1 stable et reproductible.</div>
+        <div class="tile"><strong>6. Valider</strong> Verifier sur un autre lot de traces, mesurer la robustesse, et documenter les limites, le taux de succes et le nombre de traces necessaires.</div>
+      </div>
+
+      <h3>Questions a poser avant l'attaque</h3>
+      <table>
+        <thead>
+          <tr><th>Question</th><th>Pourquoi elle compte</th><th>Impact sur la methode</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Qu'est-ce qui fuit exactement ?</td><td>Le bon point de fuite determine toute l'efficacite.</td><td>On choisit la bonne fenetre temporelle, le bon modele et le bon filtrage.</td></tr>
+          <tr><td>La fuite est-elle sur la valeur ou sur les transitions ?</td><td>Le modele HW ou HD n'est pas toujours le bon.</td><td>On adapte le calcul de prediction et la statistique associee.</td></tr>
+          <tr><td>Le systeme est-il synchronise ?</td><td>Un mauvais alignement peut masquer une fuite forte.</td><td>On ajoute des techniques d'alignement et de resynchronisation.</td></tr>
+          <tr><td>Le protocole est-il actif ou passif ?</td><td>Une attaque par faute ne se traite pas comme une attaque passive.</td><td>On choisit entre observation, perturbation ou combinaison des deux.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Modeles de fuite les plus utiles</h3>
+      <table>
+        <thead>
+          <tr><th>Modele</th><th>Idee</th><th>Quand il est pertinent</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Hamming Weight</td><td>Le cout depend du nombre de bits a 1.</td><td>Registres, bus, sorties de S-box, operations arithmetiques.</td></tr>
+          <tr><td>Hamming Distance</td><td>Le cout depend du nombre de bits modifies entre deux etats.</td><td>Transitions de registre, caches, bus et memoires internes.</td></tr>
+          <tr><td>Timing</td><td>La duree varie selon les donnees ou le secret.</td><td>Branchements secrets, divisions, mod operations, lookup non constant-time.</td></tr>
+          <tr><td>Template / profilage</td><td>On apprend des classes de traces avant d'attaquer la cible.</td><td>Quand on peut profiler un appareil similaire ou identique.</td></tr>
+          <tr><td>Higher-order</td><td>On combine plusieurs points de fuite masques.</td><td>Implementations masquees ou partagees en plusieurs composants.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Attaques possibles selon le type de fuite</h3>
+      <table>
+        <thead>
+          <tr><th>Type de fuite</th><th>Attaques typiques</th><th>Exemple concret</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Temps</td><td>Timing attacks, cache timing, branch prediction leakage</td><td>RSA non constant-time, comparaison de tags, lookup table AES.</td></tr>
+          <tr><td>Puissance</td><td>SPA, DPA, CPA, template, higher-order DPA</td><td>AES sur microcontroleur, DES historique, ECC scalaire.</td></tr>
+          <tr><td>EM</td><td>EM analysis, EM-DPA, EM profiling</td><td>Sonde de proximité sur une puce ou un module securise.</td></tr>
+          <tr><td>Cache</td><td>Prime+Probe, Flush+Reload, Evict+Time</td><td>Fonctions cryptographiques table-based sur CPU partage.</td></tr>
+          <tr><td>Fautes</td><td>Glitch, DFA, instruction skip, fault-assisted key recovery</td><td>RSA-CRT, AES derniers tours, boot verification bypass.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Lecture algorithmique : ou attaquer AES, DES, RSA et ECC</h3>
+      <table>
+        <thead>
+          <tr><th>Algorithme</th><th>Point sensible</th><th>Attaques frequentes</th><th>Message de defense</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>AES</td><td>Premier tour, S-box, MixColumns, key schedule</td><td>CPA, DPA, template, EM, cache timing, DFA fin de tours</td><td>Constant-time, masking, shuffling, AES-NI, verification TVLA</td></tr>
+          <tr><td>DES</td><td>S-box, Feistel rounds, key schedule</td><td>DPA historique, timing sur implementations naive, attaque par tables</td><td>Ne plus l'utiliser pour la securite, migrer vers AES ou autre standard moderne</td></tr>
+          <tr><td>RSA</td><td>Exponentiation modulaire, CRT, comparison finale</td><td>Timing, SPA, blinding failure, fault CRT, cache sur Montgomery</td><td>Blinding, constant-time, verification du resultat, protections contre fautes</td></tr>
+          <tr><td>ECC</td><td>Multiplication scalaire, addition de points, nonce ECDSA</td><td>SPA, timing, template, lattice attacks si nonce fuit, fault sur signature</td><td>Ladder, formules unifiees, point validation, nonce deterministic et protegee</td></tr>
+        </tbody>
+      </table>
+
+      <div class="formula">
+        Mesures utiles en evaluation : rank de cle, success rate, guessing entropy, SNR, TVLA t-test, trace-to-success ratio. Une defense n'est credible que si elle ameliore ces indicateurs face a l'attaque visee.
+      </div>
+
+      <h3>Projet sans materiel et sans zone grise</h3>
+      <p>Si tu n'as pas de banc de mesure, le plus propre est de travailler avec des jeux de traces publics, des exemples pedagogiques et les traces deja presentes dans ton workspace. Cela permet de faire un vrai rapport de securite materielle sans te bloquer sur l'acquisition.</p>
+
+      <ol>
+        <li>Utiliser un dataset public type ASCAD, DPA Contest, ChipWhisperer ou des jeux de traces pedagogiques fournis par les enseignants.</li>
+        <li>Faire une attaque CPA ou template sur AES pour montrer la mecanique complete de la fuite jusqu'a la cle.</li>
+        <li>Faire une experience de detection hardware trojan avec les traces IEEE dataport deja disponibles dans le workspace, pour relier side-channel et surveillance d'integrite.</li>
+        <li>Documenter l'environnement, les hypotheses, la taille d'echantillon, les limites et les resultats reproductibles.</li>
+      </ol>
+
+      <div class="warning">
+        <strong>Important :</strong> je n'ai pas integre de procedure illicite ou de source douteuse. Pour un memoire UCAD, les traces publiques et les donnees de laboratoire sont la bonne voie : elles sont defendables, citables et exploitables dans un cadre academique.
+      </div>
+    </section>
+
+    <section id="power">
+      <h2>7. SPA, DPA, CPA et template attacks</h2>
+
+      <h3>SPA : Simple Power Analysis</h3>
+      <p>La SPA consiste a interpreter directement une ou quelques traces. Dans une exponentiation square-and-multiply naive, un bit 1 peut produire une sequence "square + multiply", tandis qu'un bit 0 produit seulement "square". Si les formes sont visibles, l'exposant se lit presque comme un code barre.</p>
+
+      <h3>DPA : Differential Power Analysis</h3>
+      <p>Le papier de Kocher, Jaffe et Jun montre que l'on peut attaquer DES et d'autres algorithmes en separant les traces selon une prediction de bit intermediaire. Le bon sous-cle cree une difference moyenne au moment ou la puce manipule la valeur cible.</p>
+
+      <div class="formula">
+        DPA : choisir une fonction de selection D(C, b, K_s). Pour chaque hypothese de sous-cle, separer les traces en deux groupes selon D = 0 ou D = 1, puis calculer la difference de moyennes. Le bon K_s produit un pic exploitable.
+      </div>
+
+      <h3>CPA : Correlation Power Analysis</h3>
+      <p>Le papier de Brier, Clavier et Olivier formalise le modele de fuite par distance de Hamming. Une puce consomme une partie dependante des transitions de donnees, souvent modelisee par <code>H(D XOR R)</code>, ou <code>R</code> est un etat de reference inconnu. La CPA calcule la correlation entre fuite predite et trace observee.</p>
+
+      <div class="formula">
+        Modele CPA : W = a * H(D XOR R) + b. W est la consommation, a un gain, b le bruit et les composantes independantes, D la donnee manipulee, R l'etat de reference.
+      </div>
+
+      <pre><code># CPA AES simplifiee : un octet de cle
+for k in range(256):
+    prediction = HW(SBOX[plaintext[:, byte] ^ k])
+    for t in range(nb_samples):
+        score[k, t] = pearson(prediction, traces[:, t])
+
+key_byte = argmax_k(max_t(abs(score[k, t])))</code></pre>
+
+      <h3>Template attacks et attaques profilees</h3>
+      <p>Les template attacks supposent un appareil de profilage similaire sur lequel l'attaquant connait les cles. Il apprend alors la distribution statistique des traces pour chaque classe, puis compare les traces de la cible. Le papier d'Oswald et Mangard montre que le masking simple peut etre contourne par des attaques profilees, parfois avec tres peu de traces d'attaque.</p>
+
+      <table>
+        <thead>
+          <tr><th>Attaque</th><th>Besoin</th><th>Force</th><th>Limite</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>DPA</td><td>Traces cible, textes connus</td><td>Simple, historique</td><td>Ghost peaks, modele faible</td></tr>
+          <tr><td>CPA</td><td>Modele HW/HD</td><td>Robuste, tres utilisee</td><td>Depend du point de fuite</td></tr>
+          <tr><td>Template</td><td>Appareil de profilage</td><td>Quasi optimale statistiquement</td><td>Profilage couteux</td></tr>
+          <tr><td>Deep learning</td><td>Dataset etiquete</td><td>Supporte bruit/desynchronisation</td><td>Risque de surapprentissage</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="fault">
+      <h2>8. Fault injection et attaques par fautes</h2>
+      <p>Une attaque par faute modifie volontairement le calcul : glitch d'horloge, glitch de tension, impulsion electromagnetique, laser, temperature, perturbation memoire. Le but est de provoquer une erreur utile : bit flip, instruction skip, comparaison contournee, sortie cryptographique fautive.</p>
+
+      <h3>Modele Boneh-DeMillo-Lipton</h3>
+      <p>Le papier de Boneh, DeMillo et Lipton montre qu'une signature RSA calculee avec CRT devient dangereuse si une seule partie du calcul modulo <code>p</code> ou <code>q</code> est fautive. Avec une signature correcte et une signature fautive, on peut retrouver un facteur du module par un PGCD.</p>
+
+      <div class="formula">
+        Idee RSA-CRT fault : si S est correct et S' fautif seulement modulo p ou q, alors gcd(S - S', N) peut reveler p ou q. La cle privee tombe ensuite.
+      </div>
+
+      <h3>Fault attacks sur AES</h3>
+      <p>Sur AES, une faute injectee vers les derniers tours peut etre propagee de maniere structuree. En comparant chiffre correct et chiffre fautif, une Differential Fault Analysis peut reduire fortement l'espace de cle. Les fautes peuvent aussi servir a sauter une verification de signature dans un bootloader.</p>
+
+      <h3>Types de fautes</h3>
+      <table>
+        <thead>
+          <tr><th>Type</th><th>Effet</th><th>Exemple</th><th>Defense</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Bit flip</td><td>Un bit d'etat change</td><td>Registre RSA, etat AES</td><td>Code correcteur, redondance, verification</td></tr>
+          <tr><td>Instruction skip</td><td>Une instruction n'est pas executee</td><td>Bypass <code>if signature_ok</code></td><td>Double verification, controle de flux durci</td></tr>
+          <tr><td>Data corruption</td><td>Bus ou memoire corrompu</td><td>Lecture flash perturbee</td><td>MAC, ECC memoire, CRC securise</td></tr>
+          <tr><td>Clock/voltage glitch</td><td>Timing viole</td><td>CPU execute mal</td><td>Moniteurs tension/horloge, reset securise</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code>// Idee de verification defensive RSA-CRT
+signature = rsa_crt_sign(message, private_key)
+if rsa_verify(message, signature, public_key) != OK:
+    zeroize_sensitive_state()
+    return ERROR
+return signature</code></pre>
+    </section>
+
+    <section id="debug">
+      <h2>9. Debug ports, boot ROM et secrets</h2>
+      <p>En embarque, un port de debug oublie peut valoir plus qu'une faille crypto. JTAG, SWD, UART boot console, USB recovery, SPI flash externe, I2C EEPROM et pins strap de boot doivent etre consideres comme surface d'attaque.</p>
+
+      <h3>Risques courants</h3>
+      <ul>
+        <li>JTAG/SWD actif en production : lecture RAM, halt CPU, dump flash, modification registres.</li>
+        <li>UART console root sans mot de passe ou avec mot de passe par defaut.</li>
+        <li>Boot mode force par pin : demarrage sur USB/UART non authentifie.</li>
+        <li>Flash externe non chiffree : extraction directe avec clip SOIC.</li>
+        <li>Secrets dans variables d'environnement, device tree, scripts init, logs ou partition de configuration.</li>
+      </ul>
+
+      <h3>Bonnes pratiques</h3>
+      <table>
+        <thead>
+          <tr><th>Element</th><th>Mesure</th><th>Point de vigilance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>JTAG/SWD</td><td>Desactiver, verrouiller par fuse, debug authentifie</td><td>Prevoir un mode RMA securise</td></tr>
+          <tr><td>UART</td><td>Supprimer shell, proteger logs, pas de secrets</td><td>Ne pas laisser bootloader interactif</td></tr>
+          <tr><td>Flash</td><td>Chiffrement + authentification</td><td>Les cles ne doivent pas etre dans la flash</td></tr>
+          <tr><td>Boot pins</td><td>Straps proteges, modes limites</td><td>Tester les chemins de recovery</td></tr>
+          <tr><td>RMA</td><td>Effacement secrets avant retour usine</td><td>Journaliser sans exposer les cles</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="secureboot">
+      <h2>10. Secure boot, measured boot et mise a jour</h2>
+      <p>Le secure boot construit une chaine de confiance depuis une racine immuable, souvent en ROM. Chaque etape verifie la suivante avant execution : ROM verifie bootloader, bootloader verifie kernel, kernel verifie initramfs/modules/applications critiques.</p>
+
+      <div class="pipeline">
+        <div class="box">Boot ROM</div>
+        <div class="arrow">-></div>
+        <div class="box">Bootloader signe</div>
+        <div class="arrow">-></div>
+        <div class="box">Kernel / DTB</div>
+        <div class="arrow">-></div>
+        <div class="box">RootFS / App</div>
+      </div>
+
+      <h3>Secure boot vs measured boot</h3>
+      <table>
+        <thead>
+          <tr><th>Mecanisme</th><th>But</th><th>Exemple</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Secure boot</td><td>Bloquer l'execution non autorisee</td><td>Verification ECDSA/RSA avant jump</td></tr>
+          <tr><td>Measured boot</td><td>Mesurer et journaliser l'etat de boot</td><td>Hash dans TPM PCR pour attestation</td></tr>
+          <tr><td>Verified boot</td><td>Verifier partitions et rootfs</td><td>dm-verity, AVB, FIT images signees</td></tr>
+          <tr><td>Anti-rollback</td><td>Refuser un firmware ancien vulnerable</td><td>Version monotone en eFuse/OTP/secure counter</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Pipeline de mise a jour securisee</h3>
+      <ol>
+        <li>Construire le firmware dans un environnement controle.</li>
+        <li>Generer hash et metadata : version, produit, compatibilite, date, dependances.</li>
+        <li>Signer avec une cle de release protegee, idealement dans HSM ou service de signature.</li>
+        <li>Distribuer via canal TLS, mais ne pas dependre uniquement de TLS.</li>
+        <li>Verifier signature, version, produit cible et integrite sur l'appareil.</li>
+        <li>Installer en A/B slot ou avec rollback recovery.</li>
+        <li>Effacer secrets temporaires et journaliser le resultat.</li>
+      </ol>
+
+      <pre><code># Pseudo-code de boot securise
+image, metadata, signature = read_next_stage()
+if metadata.product_id != DEVICE_PRODUCT_ID:
+    halt_securely()
+if metadata.version < monotonic_counter():
+    halt_securely()
+if verify_signature(public_key_hash_in_rom, image, metadata, signature) != OK:
+    halt_securely()
+jump_to(image.entry)</code></pre>
+    </section>
+
+    <section id="puftrng">
+      <h2>11. PUF, TRNG et stockage de cles</h2>
+
+      <h3>TRNG</h3>
+      <p>Un True Random Number Generator tire son alea d'un phenomene physique : bruit thermique, jitter d'oscillateur, metastabilite, bruit avalanche. En securite materielle, le TRNG est critique parce qu'il alimente les cles, nonces, masques de side-channel et challenges.</p>
+
+      <h4>Risques TRNG</h4>
+      <ul>
+        <li>Biais ou correlation dans la source physique.</li>
+        <li>Blocage silencieux : la source ne produit plus d'entropie mais le systeme continue.</li>
+        <li>Influence externe : temperature, tension, EM, vieillissement.</li>
+        <li>Post-traitement mal compris : un hash ne cree pas d'entropie si la source est vide.</li>
+      </ul>
+
+      <h3>PUF</h3>
+      <p>Une Physical Unclonable Function utilise les variations de fabrication pour produire une reponse propre a un composant. Exemple : SRAM PUF, ring oscillator PUF, arbiter PUF. Une PUF ne remplace pas toute la gestion de cles, mais elle peut aider a deriver une cle locale sans stocker directement cette cle en memoire non volatile.</p>
+
+      <table>
+        <thead>
+          <tr><th>PUF</th><th>Principe</th><th>Avantage</th><th>Limite</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SRAM PUF</td><td>Etat au demarrage de cellules SRAM</td><td>Souvent disponible sans circuit dedie</td><td>Besoin de correction d'erreurs</td></tr>
+          <tr><td>RO PUF</td><td>Comparer frequences d'oscillateurs</td><td>Simple en FPGA/ASIC</td><td>Sensible a temperature/tension</td></tr>
+          <tr><td>Arbiter PUF</td><td>Comparer delais de chemins</td><td>Challenge-response riche</td><td>Modelisable par ML si non renforcee</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Stockage de cles</h3>
+      <ul>
+        <li>OTP/eFuse : bon pour hash de cle publique, compteur anti-rollback, configuration irreversible.</li>
+        <li>Secure element/TPM : stockage isole, operations crypto internes, attestation.</li>
+        <li>TEE/TrustZone : separation logiciel monde securise/normal, utile mais pas magique contre fautes physiques.</li>
+        <li>Key ladder : deriver des cles de session sans exposer la cle racine.</li>
+      </ul>
+    </section>
+
+    <section id="fpga">
+      <h2>12. FPGA, ASIC, DFT et scan chains</h2>
+      <p>Les FPGA et ASIC ajoutent des risques propres : vol d'IP, bitstream copie, netlist reverse-engineering, insertion de trojan, scan chains qui exposent les registres internes, et differences entre simulation RTL et silicium final.</p>
+
+      <h3>FPGA</h3>
+      <table>
+        <thead>
+          <tr><th>Risque</th><th>Description</th><th>Defense</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Bitstream theft</td><td>Copie du design depuis flash externe</td><td>Bitstream encryption + authentification</td></tr>
+          <tr><td>Readback</td><td>Lecture configuration interne</td><td>Desactiver readback, verrouillage securise</td></tr>
+          <tr><td>Partial reconfiguration</td><td>Chargement region modifiee</td><td>Signature par region, politique stricte</td></tr>
+          <tr><td>IP piracy</td><td>Clone ou reutilisation non autorisee</td><td>Watermarking, obfuscation, licensing hardware</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ASIC et DFT</h3>
+      <p>Le Design-for-Test est indispensable pour produire des circuits fiables, mais il peut exposer l'etat interne. Une scan chain mal protegee peut permettre de charger ou lire des registres sensibles, y compris des cles ou etats intermediaires d'AES.</p>
+
+      <h4>Defenses scan/DFT</h4>
+      <ul>
+        <li>Desactiver scan en mode production ou l'authentifier.</li>
+        <li>Exclure les registres sensibles des scan chains.</li>
+        <li>Chiffrer/compresser les patterns de test sensibles.</li>
+        <li>Effacer les secrets avant passage en mode test.</li>
+        <li>Controler les transitions test/normal par fuse et lifecycle state.</li>
+      </ul>
+    </section>
+
+    <section id="trojan">
+      <h2>13. Hardware trojans</h2>
+      <p>Un hardware trojan est une modification malveillante ou non autorisee d'un circuit. Il peut etre insere dans RTL, netlist, IP tierce, fab, layout ou meme via un composant remplace. Il contient generalement un declencheur et une charge utile.</p>
+
+      <h3>Taxonomie</h3>
+      <table>
+        <thead>
+          <tr><th>Axe</th><th>Categories</th><th>Exemples</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Insertion</td><td>Specification, RTL, gate-level, layout, fabrication</td><td>IP modifiee, cellule ajoutee, masque altere</td></tr>
+          <tr><td>Declencheur</td><td>Always-on, rare event, compteur, sequence, analogique</td><td>Payload active apres une suite d'entrees rare</td></tr>
+          <tr><td>Payload</td><td>Leakage, degradation, denial, privilege</td><td>Fuite de cle, erreur AES, kill switch</td></tr>
+          <tr><td>Taille</td><td>Petit, distribue, parametrique</td><td>Quelques portes ou modification de delais</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Detection</h3>
+      <ul>
+        <li>Analyse fonctionnelle : generation de tests pour activer des conditions rares.</li>
+        <li>Analyse structurelle : features RTL/netlist, graphes, fan-in/fan-out, signaux rares.</li>
+        <li>Side-channel : comparaison de puissance, EM, timing entre golden chip et suspect.</li>
+        <li>Golden-free : detection statistique sans reference parfaite.</li>
+        <li>Machine learning : classification de netlists, traces ou features physiques.</li>
+      </ul>
+
+      <div class="lab">
+        <strong>Piste locale dans ton workspace :</strong> le dossier <code>data/raw/ieee_dataport/</code> contient des traces de puissance AES pour des benchmarks avec etats <code>TrojanDisabled</code>, <code>TrojanEnabled</code> et <code>TrojanTriggered</code>. Cela permet de faire un projet ML de detection hardware trojan par side-channel sans oscilloscope.
+      </div>
+
+      <pre><code># Idee de pipeline ML pour traces hardware trojan
+1. Charger les CSV de puissance par classe
+2. Normaliser chaque trace
+3. Extraire features : moyenne, variance, energie, RMS, FFT, pics
+4. Entrainer SVM / RandomForest / CNN 1D
+5. Evaluer : accuracy, F1-score, matrice de confusion
+6. Expliquer les regions temporelles les plus discriminantes</code></pre>
+    </section>
+
+    <section id="linux">
+      <h2>14. Linux embarque et supply chain</h2>
+      <p>Le PDF <em>The Trojan Horse in Your Code</em> rappelle un point tres important pour l'embarque moderne : une partie du risque ne vient pas du code que l'on ecrit, mais du code que l'on integre. Un firmware Linux contient bootloader, kernel, modules, bibliotheques, services, paquets Python/Node/Rust/C, scripts de build, images Docker, toolchains et dependances transitives.</p>
+
+      <h3>Risque des dependances transitives</h3>
+      <ul>
+        <li>Une dependance directe peut importer des dizaines de sous-dependances invisibles.</li>
+        <li>Une vulnerabilite peut apparaitre dans du code embarque depuis des annees.</li>
+        <li>Mettre a jour peut casser certification, drivers, ABI, tests terrain ou compatibilite produit.</li>
+        <li>Les dependances orphelines restent dans les images meme si upstream ne maintient plus.</li>
+      </ul>
+
+      <h3>Controles pratiques pour Linux embarque</h3>
+      <table>
+        <thead>
+          <tr><th>Controle</th><th>Role</th><th>Exemple</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SBOM</td><td>Inventaire logiciel</td><td>SPDX/CycloneDX pour chaque firmware</td></tr>
+          <tr><td>SCA</td><td>Detection CVE/licences</td><td>Scan CI sur paquets directs et transitifs</td></tr>
+          <tr><td>Reproducible builds</td><td>Verifier provenance</td><td>Meme source donne meme artefact</td></tr>
+          <tr><td>Signature artefacts</td><td>Authentifier build</td><td>Cosign/in-toto/SLSA selon environnement</td></tr>
+          <tr><td>Runtime hardening</td><td>Limiter impact exploit</td><td>seccomp, AppArmor/SELinux, namespaces</td></tr>
+          <tr><td>Patch strategy</td><td>Reduire fenetre d'exposition</td><td>Backports, maintenance LTS, A/B updates</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Durcissement systeme</h3>
+      <ul>
+        <li>Supprimer comptes par defaut, services inutiles, shells de debug et paquets de build.</li>
+        <li>Monter rootfs en lecture seule si possible, separer donnees persistantes.</li>
+        <li>Utiliser least privilege : systemd sandboxing, capabilities minimales, seccomp.</li>
+        <li>Activer protections memoire : ASLR, NX, stack canaries, RELRO, PIE.</li>
+        <li>Journaliser sans exposer secrets : jamais de cle, token, nonce sensible dans logs.</li>
+        <li>Prevoir rotation de certificats et fin de vie securisee.</li>
+      </ul>
+    </section>
+
+    <section id="contre">
+      <h2>15. Contre-mesures globales</h2>
+
+      <h3>Contre timing/cache</h3>
+      <ul>
+        <li>Code constant-time : pas de branchement dependant d'un secret.</li>
+        <li>Pas d'acces memoire indexe par secret : eviter tables AES sur cache partage.</li>
+        <li>Utiliser AES-NI ou accelerateurs valides quand disponibles.</li>
+        <li>Comparaisons constantes pour tags, MAC et signatures.</li>
+      </ul>
+
+      <h3>Contre power/EM</h3>
+      <ul>
+        <li>Masking : separer les valeurs sensibles en parts aleatoires.</li>
+        <li>Hiding : bruit, randomisation temporelle, shuffling, equilibrage logique.</li>
+        <li>Design materiel : dual-rail/precharge, routage symetrique, decouplage, blindage.</li>
+        <li>Evaluation : TVLA, CPA de verification, success rate, guessing entropy.</li>
+      </ul>
+
+      <h3>Contre fault injection</h3>
+      <ul>
+        <li>Redondance temporelle : recalculer et comparer.</li>
+        <li>Redondance spatiale : deux chemins differents ou co-processeur de verification.</li>
+        <li>Detecteurs tension/horloge/temperature/lumiere.</li>
+        <li>Control-flow integrity leger pour bootloader.</li>
+        <li>Zeroization en cas d'anomalie et etat d'erreur sur.</li>
+      </ul>
+
+      <h3>Contre hardware trojans</h3>
+      <ul>
+        <li>IP provenance, revue RTL, lint securite, analyse de signaux rares.</li>
+        <li>Tests de declenchement rare et verification formelle quand possible.</li>
+        <li>Side-channel fingerprinting en production ou qualification.</li>
+        <li>Diversification de fournisseurs et controle chaine logistique.</li>
+        <li>Design-for-security : logique de monitoring, assertions, compteurs d'anomalies.</li>
+      </ul>
+
+      <h3>Contre supply chain logicielle</h3>
+      <ul>
+        <li>SBOM pour chaque release, y compris dependances transitives.</li>
+        <li>Build reproductible et signe, controle des toolchains.</li>
+        <li>Pinning de versions, verification de hash, miroirs internes.</li>
+        <li>Politique de patch : CVE critiques, backports, fenetre d'exposition.</li>
+        <li>Isolation runtime : meme si une dependance est vulnerable, reduire ce qu'elle peut faire.</li>
+      </ul>
+
+      <div class="note">
+        <strong>Regle d'or :</strong> une contre-mesure doit etre testee contre l'attaque qu'elle pretend bloquer. Le bruit ne prouve pas l'absence de fuite, le secure boot ne prouve pas l'absence de faille runtime, et le masking mal implemente peut rester vulnerable aux attaques d'ordre superieur.
+      </div>
+    </section>
+
+    <section id="projets">
+      <h2>16. Projets pratiques</h2>
+      <p>Les projets sont documentes dans un fichier separe pour garder ce cours concis. Chaque projet inclut le code complet, le schema de connexion sans soudure, les questions de rapport et le niveau de difficulte.</p>
+
+      <div class="lab">
+        <strong>Fichier projets :</strong> <code>projets_securite_embarquee_ngagne_demba_dia.html</code>
+      </div>
+
+      <table>
+        <thead><tr><th>Projet</th><th>Sujet</th><th>Materiel</th><th>Niveau</th></tr></thead>
+        <tbody>
+          <tr><td><strong>T1</strong></td><td>Timing attack par oracle temporel</td><td>1 MCU + cable USB</td><td>Facile</td></tr>
+          <tr><td><strong>T2</strong></td><td>CPA avec l'ADC interne STM32 (sans oscilloscope)</td><td>2 STM32 + resistance 33 ohm + fils jumper</td><td>Moyen</td></tr>
+          <tr><td><strong>T3</strong></td><td>Glitch de reset GPIO sur ESP32</td><td>STM32 + ESP32 + 1 fil jumper</td><td>Moyen</td></tr>
+          <tr><td><strong>T4</strong></td><td>Secure boot ECDSA complet sur STM32</td><td>1 STM32 + STM32CubeIDE</td><td>Avance</td></tr>
+          <tr><td><strong>T5</strong></td><td>Sniffing WiFi ESP32 et capture PMKID</td><td>1 ESP32 + votre propre routeur</td><td>Moyen</td></tr>
+          <tr><td><strong>A</strong></td><td>CPA AES sur traces publiques ASCAD/ChipWhisperer</td><td>PC uniquement</td><td>Facile</td></tr>
+          <tr><td><strong>B</strong></td><td>Detection hardware trojan par ML (IEEE Dataport)</td><td>PC uniquement</td><td>Moyen</td></tr>
+          <tr><td><strong>C</strong></td><td>Audit secure boot Linux embarque</td><td>PC + QEMU ou Raspberry Pi</td><td>Facile</td></tr>
+          <tr><td><strong>D</strong></td><td>Simulation fault injection logicielle</td><td>PC uniquement</td><td>Facile</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="audit">
+      <h2>17. Checklist d'audit securite materielle</h2>
+
+      <h3>Architecture</h3>
+      <ul>
+        <li>Quels sont les secrets ? Ou sont-ils generes, stockes, utilises, detruits ?</li>
+        <li>Quelle est la racine de confiance ? ROM, OTP, TPM, secure element ?</li>
+        <li>Quelles operations dependent de secrets ? Sont-elles constant-time ?</li>
+        <li>Quelles interfaces existent en production ? JTAG, SWD, UART, USB recovery, Ethernet, radio ?</li>
+      </ul>
+
+      <h3>Firmware</h3>
+      <ul>
+        <li>Le firmware est-il signe ? Chiffre si necessaire ? Anti-rollback ?</li>
+        <li>Les cles privees de signature sont-elles hors du repo et protegees ?</li>
+        <li>Existe-t-il un mode recovery authentifie ?</li>
+        <li>Le rootfs est-il verifie et minimal ?</li>
+      </ul>
+
+      <h3>Cryptographie</h3>
+      <ul>
+        <li>AES utilise-t-il un mode authentifie avec nonce unique ?</li>
+        <li>RSA-CRT verifie-t-il le resultat avant sortie ?</li>
+        <li>ECDSA protege-t-il strictement son nonce ?</li>
+        <li>Le TRNG a-t-il health tests et fallback sur DRBG correctement seed ?</li>
+      </ul>
+
+      <h3>Side-channel/fault</h3>
+      <ul>
+        <li>Les implementations critiques ont-elles ete testees TVLA ?</li>
+        <li>Les zones sensibles sont-elles masquees ou rendues constantes ?</li>
+        <li>Les detecteurs tension/horloge provoquent-ils un reset sur ?</li>
+        <li>Les erreurs effacent-elles les secrets temporaires ?</li>
+      </ul>
+
+      <h3>Supply chain</h3>
+      <ul>
+        <li>Existe-t-il une SBOM par version de firmware ?</li>
+        <li>Les dependances transitives sont-elles inventoriees ?</li>
+        <li>Les artefacts de build sont-ils signes et reproductibles ?</li>
+        <li>Les composants EOL ont-ils une strategie de mitigation ?</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <h2>18. Notes de lecture des PDF utilises</h2>
+      <p>Les PDF du dossier <code>C:\Users\ngdia\Documents\doc_linuc_embarquee</code> ont ete utilises comme corpus local. Les idees ci-dessous sont reformulees et integrees au cours, sans reproduction longue des textes.</p>
+
+      <table>
+        <thead>
+          <tr><th>PDF</th><th>Contenu lu</th><th>Parties ajoutees au cours</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Understanding Cryptography by Christof Paar .pdf</code></td>
+            <td>Fondations crypto : DES, AES, modes, RSA, DH, ECC, signatures, hash, key establishment.</td>
+            <td>Sections crypto, DES/AES, RSA/ECC, modes, signatures, DH, hachage, secure boot et gestion de cles.</td>
+          </tr>
+          <tr>
+            <td><code>3-540-48405-1_25.pdf</code></td>
+            <td>Kocher/Jaffe/Jun, Differential Power Analysis : SPA, DPA, traces de puissance, DES, bruit, contre-mesures.</td>
+            <td>Sections SPA/DPA, methode d'attaque, bruit, selection function, contre-mesures power.</td>
+          </tr>
+          <tr>
+            <td><code>3-540-68697-5_9.pdf</code></td>
+            <td>Kocher, timing attacks sur RSA, DH, DSS : temps variable, detection statistique, blinding.</td>
+            <td>Sections timing attacks, RSA/DH, constant-time, limites des delais aleatoires.</td>
+          </tr>
+          <tr>
+            <td><code>978-3-540-28632-5_2.pdf</code></td>
+            <td>Brier/Clavier/Olivier, CPA : modele distance de Hamming, correlation, ghost peaks DPA, DES/AES.</td>
+            <td>Section CPA avec modele <code>W = aH(D XOR R)+b</code>, comparaison DPA/CPA, pseudo-code CPA AES.</td>
+          </tr>
+          <tr>
+            <td><code>3-540-69053-0_4.pdf</code></td>
+            <td>Boneh/DeMillo/Lipton, attaques par fautes sur RSA-CRT, Rabin, protocoles d'identification.</td>
+            <td>Section fault injection, RSA-CRT PGCD, instruction skip, verification defensive.</td>
+          </tr>
+          <tr>
+            <td><code>11967668_16.pdf</code></td>
+            <td>Oswald/Mangard, template attacks sur masking AES, attaque profilee contre implementation masquee.</td>
+            <td>Section template attacks, limites du masking premier ordre, besoin d'evaluation avancee.</td>
+          </tr>
+          <tr>
+            <td><code>The-Trojan-Horse-in-Your-Code.pdf</code></td>
+            <td>Risque herite des dependances open source, dependances transitives, composants orphelins, durcissement runtime.</td>
+            <td>Section Linux embarque et supply chain : SBOM, SCA, patching, runtime hardening, dependances transitives.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Bibliographie conseillee pour aller plus loin</h3>
+      <ul>
+        <li>Stefan Mangard, Elisabeth Oswald, Thomas Popp, <em>Power Analysis Attacks</em>.</li>
+        <li>Mark Tehranipoor, Cliff Wang, <em>Introduction to Hardware Security and Trust</em>.</li>
+        <li>Christof Paar, Jan Pelzl, <em>Understanding Cryptography</em>.</li>
+        <li>Kocher, Jaffe, Jun, <em>Differential Power Analysis</em>.</li>
+        <li>Brier, Clavier, Olivier, <em>Correlation Power Analysis with a Leakage Model</em>.</li>
+        <li>Boneh, DeMillo, Lipton, <em>On the Importance of Checking Cryptographic Protocols for Faults</em>.</li>
+        <li>Documentation ChipWhisperer, datasets ASCAD ANSSI, DPA Contest et jeux de traces academiques.</li>
+        <li>Standards utiles : FIPS 197 pour AES, FIPS 186-5 pour signatures, FIPS 140-3 pour modules cryptographiques, ISO/IEC 17825 pour tests side-channel.</li>
+      </ul>
+    </section>
+
+    <section id="em_analysis">
+      <h2>20. Analyse electromagnetique (SEMA, DEMA, EMCA) et EMFI</h2>
+      <p class="lead">L'analyse electromagnetique (EMA) exploite le rayonnement emis localement par le circuit integre. Contrairement a la power analysis qui necessite un shunt ou une sonde globale sur l'alimentation, une sonde EM peut se positionner directement au-dessus d'un bloc specifique du die, offrant une resolution spatiale que le courant d'alimentation ne permet pas.</p>
+
+      <h3>Sondes EM : champ H et champ E</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Ce qu'elle mesure</th><th>Usage typique</th><th>Exemple de capteur</th></tr></thead>
+        <tbody>
+          <tr><td>Boucle (champ H)</td><td>Courant circulant dans les metallisations</td><td>EM-DPA sur crypto, isolation de blocs</td><td>Langer RF-U 2.5-3, Tekbox TBMDA1</td></tr>
+          <tr><td>Monopole/dipole (champ E)</td><td>Variations de potentiel electrique</td><td>Identification de signaux numeriques, horloges</td><td>Sonde differentielle haute impedance</td></tr>
+        </tbody>
+      </table>
+
+      <h3>SEMA, DEMA et EMCA</h3>
+      <table>
+        <thead><tr><th>Attaque</th><th>Principe</th><th>Analogie power</th><th>Avantage specifique EM</th></tr></thead>
+        <tbody>
+          <tr><td>SEMA</td><td>Interpreter directement une trace EM : formes d'onde, patterns d'operations</td><td>SPA</td><td>Resolution spatiale : isoler une operation precise sur un bloc du die</td></tr>
+          <tr><td>DEMA</td><td>Separer traces selon prediction de bit intermediaire et calculer une difference moyenne</td><td>DPA</td><td>Peut cibler un coeur ou un peripherique specifique sur un SoC</td></tr>
+          <tr><td>EMCA</td><td>Calculer la correlation entre traces EM et modele HW/HD, hypothese par hypothese</td><td>CPA</td><td>Meme formalisme que CPA, converge souvent plus vite sur les puces non blindees</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>Avantage cle de l'EMA :</strong> un module avec blindage metallique peut encore fuir en champ proche. De plus, si deux algorithmes tournent en parallele sur le meme SoC, la power trace est un melange des deux ; une sonde EM positionnee sur le bon bloc isole la cible.
+      </div>
+
+      <h3>Workflow d'une attaque EM pratique</h3>
+      <ol>
+        <li><strong>Cartographie :</strong> balayer la surface de la puce avec la sonde (table XY motorisee ou deplacement manuel), enregistrer l'amplitude EM a chaque position pendant une operation connue. Identifier les zones les plus actives (hotspots).</li>
+        <li><strong>Positionnement :</strong> placer la sonde au meilleur point de fuite identifie. Ajuster la hauteur (1-2 mm typique) et l'orientation pour maximiser le SNR.</li>
+        <li><strong>Acquisition :</strong> capturer N traces (5 000 a 50 000 selon la cible) en faisant varier le texte clair. Enregistrer la valeur du parametre variable avec chaque trace.</li>
+        <li><strong>EMCA :</strong> appliquer le meme algorithme CPA qu'en power analysis. Calculer la correlation entre traces et modele HW(SBox[clair XOR hypothese_cle]) pour chaque hypothese. La bonne cle sort en rang 1.</li>
+        <li><strong>Validation :</strong> verifier le rang de cle sur un second lot, mesurer le nombre de traces necessaires a 80 % de succes (success rate).</li>
+      </ol>
+
+      <pre><code>import numpy as np
+
+# EMCA sur premier octet de cle AES premier tour
+# traces_em : (N_traces, N_samples)
+# plaintexts : (N_traces,) - premier octet
+
+SBOX = [
+    0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
+    # ... table AES complete (256 entrees)
+]
+
+correlations = np.zeros((256, traces_em.shape[1]))
+for key_hyp in range(256):
+    hw = np.array([bin(SBOX[p ^ key_hyp]).count('1') for p in plaintexts])
+    for t in range(traces_em.shape[1]):
+        correlations[key_hyp, t] = np.corrcoef(hw, traces_em[:, t])[0, 1]
+
+best_key = np.argmax(np.max(np.abs(correlations), axis=1))
+print(f"Hypothese de cle gagnante : 0x{best_key:02X}")</code></pre>
+
+      <h3>EMFI : Electromagnetic Fault Injection</h3>
+      <p>L'EMFI utilise une impulsion EM breve et localisee pour perturber l'execution du processeur : instruction skip, flip de bit memoire, dereglement de bus, corruption de donnees. L'impulsion est generee par un circuit de decharge rapide dans une spire de cuivre placee au-dessus de la puce.</p>
+
+      <table>
+        <thead><tr><th>Parametre</th><th>Effet sur la faute</th><th>Valeur typique</th></tr></thead>
+        <tbody>
+          <tr><td>Position XY</td><td>Determiner le bloc affecte : CPU, cache, bus, memoire</td><td>Cartographier par scan, hotspot sur coeur d'execution</td></tr>
+          <tr><td>Delai (offset)</td><td>Determiner l'instruction ciblee dans la fenetre d'attaque</td><td>Scan en pas de 10 ns sur une fenetre de 500 ns</td></tr>
+          <tr><td>Amplitude</td><td>Intensite de la perturbation : de glitch leger a reset complet</td><td>20-80 V selon la puce et le couplage</td></tr>
+          <tr><td>Duree de l'impulsion</td><td>Etendue de la perturbation dans le temps</td><td>2-10 ns typique</td></tr>
+        </tbody>
+      </table>
+
+      <div class="pipeline">
+        <div class="box">Generateur d'impulsion</div>
+        <div class="arrow">-&gt;</div>
+        <div class="box">Spire EMFI (2-5 mm)</div>
+        <div class="arrow">-&gt;</div>
+        <div class="box">Puce cible</div>
+        <div class="arrow">-&gt;</div>
+        <div class="box">Observation sortie</div>
+        <div class="arrow">-&gt;</div>
+        <div class="box">Classement : faute / normal / reset</div>
+      </div>
+
+      <h3>Outils du marche</h3>
+      <table>
+        <thead><tr><th>Outil</th><th>Type</th><th>Caracteristiques</th></tr></thead>
+        <tbody>
+          <tr><td>ChipWhisperer-Husky + EMFI shield</td><td>Open source / academique</td><td>EMFI + acquisition power/EM, Python API, adapte aux TP et projets master</td></tr>
+          <tr><td>Riscure Spider + iMPACT</td><td>Professionnel</td><td>EMFI + VFI + laser, precision ns, cartographie integree, laboratoires de certification</td></tr>
+          <tr><td>Langer probes + preamplificateurs</td><td>Mesure EM passive</td><td>Gamme RF-U, probes 100 MHz - 3 GHz, haute resolution spatiale</td></tr>
+          <tr><td>NewAE EMFI stick</td><td>Low cost</td><td>Prise USB, impulsions simples, bon pour premiers tests sur plateformes connues</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Contre-mesures EM</h3>
+      <ul>
+        <li><strong>Blindage EM :</strong> boitier metallique, cage de Faraday integree autour du die, couche de metallisation superieure conductrice. Efficace contre la mesure passive ; moins contre l'EMFI localisee a tres courte distance.</li>
+        <li><strong>Randomisation spatiale et temporelle :</strong> shuffling des operations, insertion de cycles aleatoires. Augmente le nombre de traces necessaires sans supprimer la fuite fondamentale.</li>
+        <li><strong>Detecteurs d'impulsion EM :</strong> circuits sur le die qui detectent une impulsion anormale et declenchent un reset ou une zeroisation. Requis par les criteres Common Criteria aux niveaux eleves.</li>
+        <li><strong>Logiques differentielles (SABL, WDDL) :</strong> dans les coeurs securises, ces logiques equiparent la consommation pour les bits 0 et 1, eliminant la dependance dato-cle dans le signal EM.</li>
+      </ul>
+    </section>
+
+    <section id="masking_ho">
+      <h2>21. Masking d'ordre superieur et evaluation TVLA</h2>
+      <p class="lead">Le masking est la contre-mesure logicielle la plus deployee contre les attaques par observation. L'idee : remplacer chaque variable sensible par une combinaison de plusieurs parts aleatoires, de sorte qu'observer une part seule ne revele rien sur le secret. Le TVLA (Test Vector Leakage Assessment) est la methode standard pour valider experimentalement qu'une implementation ne fuit pas au premier ordre.</p>
+
+      <h3>Masking booleen au premier ordre</h3>
+      <p>Une variable sensible <code>x</code> est masquee en deux parts : <code>x' = x XOR r</code> et le masque <code>r</code> genere aleatoirement. Les operations suivantes doivent traiter <code>x'</code> et <code>r</code> separement pour preserver la propriete.</p>
+
+      <div class="formula">
+        Propriete de base : si r est uniforme sur {0,1}^n, alors x' = x XOR r est aussi uniforme.
+        Observer x' seul ne donne aucune information statistique sur x.
+      </div>
+
+      <h3>Limite : attaque du second ordre</h3>
+      <p>Une implementation masquee au premier ordre reste vulnerable si un attaquant peut observer deux points de trace fuites : l'un sur <code>x'</code> et l'autre sur <code>r</code>. En combinant ces deux points (produit, correlation croisee, moment centre d'ordre 2), il retrouve x. C'est ce que Oswald et Mangard ont demontre sur AES masque.</p>
+
+      <table>
+        <thead><tr><th>Ordre de masking</th><th>Parts par variable</th><th>Resiste a</th><th>Vulnerable a</th></tr></thead>
+        <tbody>
+          <tr><td>Ordre 1</td><td>2 parts (x' = x XOR r)</td><td>Attaques d'ordre 1 : DPA, CPA classique</td><td>Attaques d'ordre 2 : 2-DPA, moment centre, produit de points</td></tr>
+          <tr><td>Ordre 2</td><td>3 parts (x = s0 XOR s1 XOR s2)</td><td>Attaques d'ordre 1 et 2</td><td>Attaques d'ordre 3, cout calcul multiplie par ~3</td></tr>
+          <tr><td>Ordre d</td><td>d+1 parts</td><td>Toute attaque d'ordre &lt;= d</td><td>Attaques d'ordre d+1 ; cout calcul en O(d^2) ou plus</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Threshold Implementations (TI)</h3>
+      <p>Les TI (Nikova, Rijmen, Schlaeffer, 2006) sont une forme de masking au niveau circuit satisfaisant trois proprietes formelles garantissant la resistance au premier ordre meme en presence de fuites de glitch :</p>
+      <ol>
+        <li><strong>Correctness :</strong> la reconstruction des parts donne le bon resultat.</li>
+        <li><strong>Non-completeness :</strong> chaque fonction partielle ne depend pas de tous les partages d'un meme input en meme temps.</li>
+        <li><strong>Uniformity :</strong> la distribution des partages de sortie est uniforme (aucun biais statistique introduce par la fonction).</li>
+      </ol>
+      <p>Une TI pour AES necessite au minimum 3 parts, ce qui triple environ la surface logique et l'energie. Les TI d'ordre superieur existent mais a un cout materiel croissant rapidement.</p>
+
+      <h3>TVLA : Test Vector Leakage Assessment</h3>
+      <p>Le TVLA (Goodwill et al., NIST Workshop 2011) permet de tester si une implementation fuit au premier ordre sans meme savoir ou chercher. C'est un test statistique non specifique : si le test detecte une fuite, il faut localiser et exploiter ; s'il ne detecte rien, c'est un bon signe mais pas une garantie absolue.</p>
+
+      <div class="formula">
+        Test de Welch (t-test) applique au TVLA :
+        t = (mu_fixed - mu_random) / sqrt(sigma_fixed^2 / N_fixed + sigma_random^2 / N_random)
+        Seuil standard TVLA : |t| &gt; 4.5 indique une fuite statistiquement significative.
+      </div>
+
+      <h3>Protocole TVLA fixe/aleatoire</h3>
+      <ol>
+        <li>Definir un ensemble S_fixed : toutes les acquisitions sont faites avec un texte clair fixe (meme valeur).</li>
+        <li>Definir un ensemble S_random : textes clairs uniformement aleatoires.</li>
+        <li>Acquerir N_fixed + N_random traces (10 000 a 100 000 par ensemble recommande), en intercalant aleatoirement les deux jeux pour eviter les biais de derive.</li>
+        <li>Pour chaque echantillon temporel t_k, calculer le t-test de Welch entre les deux ensembles.</li>
+        <li>Tracer la courbe t(t_k). Tout pic depassant ±4.5 signale une fuite mesurable.</li>
+      </ol>
+
+      <pre><code>import numpy as np
+from scipy import stats
+
+# traces_fixed  : (N_fixed,  N_samples) - toutes mesures avec clair fixe
+# traces_random : (N_random, N_samples) - textes clairs aleatoires
+
+t_stat, _ = stats.ttest_ind(
+    traces_fixed, traces_random,
+    axis=0,
+    equal_var=False   # Welch, pas Student
+)
+
+# t_stat shape : (N_samples,)
+# Visualiser avec matplotlib.pyplot.plot(t_stat)
+# Marquer les lignes horizontales a +4.5 et -4.5
+leaking_samples = np.where(np.abs(t_stat) > 4.5)[0]
+print(f"Echantillons fuites : {len(leaking_samples)} sur {t_stat.shape[0]}")</code></pre>
+
+      <div class="warning">
+        <strong>Limites du TVLA :</strong> un test TVLA negatif ne prouve pas l'absence de fuite. Il dit seulement qu'aucune fuite n'a ete detectee avec ce nombre de traces et ce protocole specifique. Un attaquant motive peut utiliser plus de traces, un modele different, ou cibler un ordre superieur. Le TVLA est un outil de screening, pas une certification finale.
+      </div>
+
+      <h3>TVLA specifique vs non specifique</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Jeux de traces</th><th>Ce qu'il detecte</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td>Non specifique (fixe/aleatoire)</td><td>Clair fixe vs clairs aleatoires</td><td>Toute fuite d'ordre 1 sur un vecteur</td><td>Verification rapide, screening initial d'une implementation</td></tr>
+          <tr><td>Specifique (semi-fixe)</td><td>Deux ensembles partageant un bit cible</td><td>Fuite sur un bit intermediaire particulier</td><td>Cibler un octet, une operation ou un algorithme precis</td></tr>
+          <tr><td>TVLA d'ordre superieur</td><td>Moments centres d'ordre 2 ou 3</td><td>Fuites d'ordre 2 et 3 residuelles malgre masking</td><td>Validation d'implementations masquees ou de TI</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="certification">
+      <h2>22. Certification securite materielle : CC et FIPS 140-3</h2>
+      <p class="lead">Les evaluations de securite formelle permettent a un vendeur de faire valider ses protections par un laboratoire accredite independant. Pour un praticien, comprendre ces cadres, c'est parler le langage des specifications que les clients grands comptes et les agences gouvernementales exigent.</p>
+
+      <h3>Common Criteria (CC / ISO 15408)</h3>
+      <p>Les Common Criteria definissent un cadre commun pour specifier et evaluer la securite d'un produit : microcontroleurs securises, cartes a puce, TPM, HSM, modules radio, systemes embarques critiques.</p>
+
+      <table>
+        <thead><tr><th>Concept</th><th>Definition</th><th>Exemple concret</th></tr></thead>
+        <tbody>
+          <tr><td>TOE (Target of Evaluation)</td><td>Le produit soumis a evaluation, avec son perimetre exactement defini</td><td>Microcontroleur securise + firmware de base, sans les applications utilisateur</td></tr>
+          <tr><td>Security Target (ST)</td><td>Document decrivant la securite du TOE specifique : menaces, objectifs, fonctions implementees</td><td>Liste des protections contre fault injection, timing, EM, debug</td></tr>
+          <tr><td>Protection Profile (PP)</td><td>ST generique pour une categorie de produits, reutilisable par plusieurs vendeurs</td><td>PP pour cartes de paiement EMV, PP pour passeports electroniques ICAO</td></tr>
+          <tr><td>EAL (Evaluation Assurance Level)</td><td>Niveau de rigueur de l'evaluation de 1 (basique) a 7 (formel)</td><td>EAL4+ frequent pour produits grand public securises ; EAL6-7 pour militaire et tres haute securite</td></tr>
+        </tbody>
+      </table>
+
+      <h3>AVA_VAN : l'evaluation de vulnerabilite materielle</h3>
+      <p>La classe AVA_VAN (Vulnerability Analysis and Penetration Testing) est le sous-ensemble des CC le plus pertinent pour la securite physique. Elle definit le niveau d'attaquant auquel le produit doit resister.</p>
+
+      <table>
+        <thead><tr><th>Niveau AVA_VAN</th><th>Potentiel d'attaque supporte</th><th>Activite du laboratoire</th></tr></thead>
+        <tbody>
+          <tr><td>AVA_VAN.1</td><td>Attaquant basique (public)</td><td>Revue documentaire des vulnerabilites potentielles connues</td></tr>
+          <tr><td>AVA_VAN.2</td><td>Attaquant basique a avance</td><td>Tests de penetration independants sur les vulnerabilites identifiees</td></tr>
+          <tr><td>AVA_VAN.3</td><td>Attaquant modere</td><td>Tests methodiques en boite noire, analyse des guides et specs publiques</td></tr>
+          <tr><td>AVA_VAN.4</td><td>Attaquant avance</td><td>Tests en boite grise (documentation interne), side-channel, fautes, debug bypass</td></tr>
+          <tr><td>AVA_VAN.5</td><td>Attaquant tres avance</td><td>Acces au design, tests exhaustifs side-channel, fautes, reverse engineering, lab specialise</td></tr>
+        </tbody>
+      </table>
+
+      <div class="formula">
+        Potentiel d'attaque (calcul CCMB) :
+        score = temps_ecoule + expertise + connaissance_du_TOE + fenetre_opportunite + equipement
+        Chaque composante est notee selon une grille standard.
+        La somme determine le niveau AVA_VAN que le produit satisfait ou non.
+      </div>
+
+      <h3>FIPS 140-3 : modules cryptographiques</h3>
+      <p>La FIPS 140-3 (alignee sur ISO/IEC 19790) definit quatre niveaux de securite pour les modules cryptographiques. Elle est obligatoire pour les produits cryptographiques vendus aux agences federales americaines et de plus en plus exigee en Europe et en Asie.</p>
+
+      <table>
+        <thead><tr><th>Niveau</th><th>Exigences physiques</th><th>Cible typique</th></tr></thead>
+        <tbody>
+          <tr><td>Niveau 1</td><td>Aucune protection physique requise</td><td>Module logiciel, librairie crypto embarquee, firmware sur MCU standard</td></tr>
+          <tr><td>Niveau 2</td><td>Evidence de violation (tamper-evidence) : sceaux, vernis, boitier inviolable</td><td>Cryptoprocesseurs de bureau, HSM compacts, tokens USB</td></tr>
+          <tr><td>Niveau 3</td><td>Protection active : detection + zeroisation automatique en cas de violation</td><td>HSM serveur, TPM, cartes a puce securisees, modules de paiement</td></tr>
+          <tr><td>Niveau 4</td><td>Protection complete : detecteurs environnementaux (temperature, tension, EM, laser)</td><td>Modules haute securite pour systemes militaires ou financiers critiques</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Auto-tests obligatoires FIPS 140-3</h3>
+      <ul>
+        <li><strong>Power-up self-test :</strong> au demarrage, verifier l'integrite du firmware (HMAC-SHA-256 ou signature ECDSA sur le code), et valider chaque algorithme avec des vecteurs de test connus (Known Answer Tests).</li>
+        <li><strong>Continuous random number generator test :</strong> le TRNG surveille en continu ses sorties : detecte un blocage, un biais persistant ou une repetition.</li>
+        <li><strong>Pair-wise consistency test :</strong> apres generation d'une paire cle publique/privee, verifier que la cle publique correspond bien a la cle privee generee avant de l'utiliser.</li>
+        <li><strong>Conditional bypass test :</strong> verifier que les fonctions de bypass (modes debug, test) ne contournent pas les controles de securite.</li>
+      </ul>
+
+      <h3>Workflow de certification pour un praticien</h3>
+      <ol>
+        <li><strong>Perimetre :</strong> definir le TOE boundary : qu'est-ce qui est dans le module securise et qu'est-ce qui ne l'est pas ? Un contour mal defini ralentit toute l'evaluation.</li>
+        <li><strong>Niveau cible :</strong> choisir EAL (CC) et/ou niveau FIPS en fonction des exigences clients et du marche vise (gouvernement, paiement, sante, automotive).</li>
+        <li><strong>Documentation :</strong> rediger le Security Target (CC) ou le Security Policy Document (FIPS). Documenter chaque fonction de securite et sa correspondance avec les exigences.</li>
+        <li><strong>Developpement conforme :</strong> implementer les auto-tests obligatoires, les mecanismes de zeroisation, et les protections physiques requises par le niveau vise.</li>
+        <li><strong>Pre-evaluation :</strong> engager le laboratoire accredite (CESTI en France / ANSSI, NSCIB / Brightsight aux Pays-Bas, NIAP aux USA, BSI en Allemagne) pour une phase de gap analysis.</li>
+        <li><strong>Evaluation formelle :</strong> revue documentaire, tests fonctionnels, tests de penetration selon AVA_VAN ou le niveau FIPS.</li>
+        <li><strong>Certification :</strong> l'organisme national emet le certificat (ANSSI, BSI, NIST CMVP pour FIPS). Valable generalement 2 a 5 ans.</li>
+      </ol>
+
+      <div class="note">
+        <strong>Ordre de grandeur cout/duree :</strong> une evaluation CC EAL4+ prend 6 a 18 mois et peut couter de 200 000 EUR a plus d'un million selon la complexite. FIPS 140-3 niveau 2 prend 6 a 12 mois. Regle d'or : integrer les exigences de certification des la phase de conception, pas en fin de projet.
+      </div>
+    </section>
+
+    <section id="obfuscation">
+      <h2>23. Obfuscation materielle et protection de propriete intellectuelle</h2>
+      <p class="lead">La fabrication des circuits integres implique des acteurs multiples : bureau de conception, fonderie, test, packaging, distribution. Chaque acteur peut potentiellement copier, reverse-enginer ou modifier un design. L'obfuscation materielle regroupe les techniques deployees pour proteger l'IP et l'integrite du design tout au long de cette chaine.</p>
+
+      <h3>Le probleme : la chaine de fabrication ne vous appartient pas</h3>
+      <div class="grid">
+        <div class="tile"><strong>Vol de design</strong> Un acteur de la fonderie copie la netlist et la revend a un concurrent ou la fabrique en excedent (surproduction non autorisee, grey market).</div>
+        <div class="tile"><strong>Clonage de circuit</strong> Un circuit est reverse-engineere depuis des echantillons physiques : decapsulation, deprocessing couche par couche, imagerie SEM, reconstruction de la netlist complete.</div>
+        <div class="tile"><strong>Overshipping</strong> La fonderie produit plus d'exemplaires que commande et les ecoule sur le marche gris ou a des clients non autorises.</div>
+        <div class="tile"><strong>Insertion de trojan</strong> Un acteur malveillant de la chaine modifie le design pour y inserer une backdoor materielle silencieuse (voir section 13 hardware trojans).</div>
+      </div>
+
+      <h3>Logic Locking</h3>
+      <p>Le logic locking insere dans la netlist des portes supplementaires controlees par une cle secrete K. Avec la mauvaise cle, le circuit produit un resultat incorrect sur au moins un vecteur de test. Avec la bonne cle, il fonctionne normalement. La cle est chargee depuis un element securise uniquement sur l'appareil final de l'utilisateur legitime.</p>
+
+      <div class="formula">
+        F_locked(X, K) = F(X)       si K = K_correct
+        F_locked(X, K) = F_wrong(X) si K != K_correct
+        Objectif : rendre le circuit inutilisable sans connaitre K, meme avec acces complet a la netlist.
+      </div>
+
+      <table>
+        <thead><tr><th>Variante</th><th>Principe</th><th>Force</th><th>Faiblesse connue</th></tr></thead>
+        <tbody>
+          <tr><td>Basique (XOR/XNOR)</td><td>Portes XOR controlees par K insertees sur des signaux du chemin de donnees</td><td>Simple a implementer, faible overhead</td><td>Vulnerable a l'attaque SAT (Subramanyan 2015) en quelques minutes sur un desktop</td></tr>
+          <tr><td>Cyclic logic locking</td><td>Boucles combinatoires cycliques controlees par K</td><td>Complexifie l'attaque SAT classique</td><td>Risques de metastabilite ; des variantes SAT ciblant les cycles existent</td></tr>
+          <tr><td>SFLL (Strip-Functionaly Logic Locking)</td><td>Garantit que les vecteurs de test connus ne fuient pas d'info sur K</td><td>Resistance formelle aux attaques a oracle ouvert</td><td>Nouvelles attaques par apprentissage automatique ont ete publiees depuis</td></tr>
+          <tr><td>Deep learning locking</td><td>Sequences de key gates generees par reseaux neuronaux</td><td>Resistance accrue contre SAT et variantes</td><td>Technique emergente, pas encore standardisee</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warning">
+        <strong>Attaque SAT (Subramanyan et al., DAC 2015) :</strong> avec acces a un oracle (un exemplaire du circuit fonctionnel), un attaquant identifie des vecteurs discriminants (DIPs) qui elimininent des hypotheses de cle. Pour le locking basique, quelques centaines d'iterations SAT retrouvent K completement. Tout scheme de logic locking doit etre evalue face a cette attaque avant deploiement.
+      </div>
+
+      <h3>Camouflage de portes logiques</h3>
+      <p>Le camouflage consiste a fabriquer des cellules qui semblent identiques au microscope electronique mais implementent des fonctions differentes. Un adversaire qui image le die couche par couche ne peut pas distinguer un NAND d'un NOR sans test electrique individuel de chaque cellule.</p>
+      <ul>
+        <li><strong>Techniques :</strong> dopants invisibles a l'imagerie SEM standard, contacts factices, modifications de contacts selectifs, cellules a fonction programmable apres fabrication.</li>
+        <li><strong>Overhead :</strong> 10-20 % de surface supplementaire pour les cellules camouflees, delai d'evaluation supplementaire.</li>
+        <li><strong>Limite :</strong> si l'attaquant peut effectuer des tests electriques systematiques via sondes fines sur le die expose, il reconstruit la vraie fonction. Efficace surtout contre imagerie passive (SEM, TEM).</li>
+      </ul>
+
+      <h3>IC Metering et empreintes numeriques</h3>
+      <p>Le metering permet au concepteur de controler l'activation de chaque exemplaire produit, rendant le vol par surproduction detectables ou impossible.</p>
+      <table>
+        <thead><tr><th>Approche</th><th>Principe</th><th>Avantage</th><th>Limite</th></tr></thead>
+        <tbody>
+          <tr><td>Metering passif</td><td>PUF ou identifiant grave dans chaque circuit ; le concepteur inventorie les IDs autorises</td><td>Pas de protocole actif requis ; detectable apres coup</td><td>Ne bloque pas la surproduction, detecte apres le fait</td></tr>
+          <tr><td>Metering actif</td><td>Circuit verrouille jusqu'a activation via protocole challenge-response avec le concepteur</td><td>La fonderie ne peut pas activer de circuits supplementaires sans l'accord du concepteur</td><td>Necessite une infrastructure d'activation securisee et disponible</td></tr>
+          <tr><td>Watermarking</td><td>Signature proprietaire inseree dans le design (contraintes de placement, patterns de cellules)</td><td>Verifiable a posteriori pour attribution forensique en cas de litige</td><td>N'empeche pas l'exploitation du design vole ; preuve juridique seulement</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Split Manufacturing</h3>
+      <p>La fabrication partagee divise le processus entre deux fonderies : une fonderie de confiance realise les couches metalliques superieures (BEOL) ; une fonderie non confidentielle realise les transistors (FEOL). La netlist complete n'est jamais connue d'un seul acteur.</p>
+
+      <table>
+        <thead><tr><th>Avantage</th><th>Limite</th></tr></thead>
+        <tbody>
+          <tr><td>La fonderie FEOL ne voit qu'une partie du design ; reproduire un circuit complet sans les couches BEOL est tres difficile</td><td>Deux fonderies, logistique complexe, cout eleve, uniquement viable pour grands volumes</td></tr>
+          <tr><td>Protection efficace contre l'insertion de trojan au niveau transistors (FEOL)</td><td>Attaques de proximity-based netlist reconstruction : si le placement est predictible, la netlist peut etre partiellement reconstruite</td></tr>
+          <tr><td>Se combine bien avec le logic locking pour une protection en profondeur</td><td>Necessite de concevoir le placement en tenant compte de la coupure FEOL/BEOL des la phase RTL</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        <strong>Bilan praticien :</strong> pour la plupart des projets embarques, le premier niveau de protection IP passe par le logic locking evalue face a SAT, la desactivation des ports de debug en production, le chiffrement et l'authentification du bitstream FPGA, et l'utilisation d'elements securises pour les cles d'activation. Les techniques avancees (split manufacturing, camouflage de cellules) relevent de fonderies specialisees et de volumes justifiant leur cout supplementaire.
+      </div>
+    </section>
+
+    <section id="resume">
+      <h2>19. Resume final</h2>
+      <p>La securite materielle relie trois mondes : le mathematique, le logiciel et le physique. Une cle AES peut etre solide, mais fuir dans une trace de puissance ou d'emission electromagnetique. Une signature RSA peut etre correcte, mais tomber a cause d'une faute injectee. Un firmware peut etre chiffre, mais dangereux s'il n'est pas authentifie. Un systeme Linux peut etre propre dans son code maison, mais fragile par ses dependances. Un design ASIC peut etre fonctionnel, mais vole a la fonderie si aucune protection n'est en place.</p>
+      <p>Pour un praticien de la securite des systemes embarques, l'objectif est de savoir construire un raisonnement complet : actif a proteger, modele de menace, primitive crypto, implementation, fuite physique possible (power, EM, timing, faute), mesure experimentale (CPA, EMCA, TVLA, DFA), contre-mesure (masking, shielding, logic locking), validation selon les standards (CC AVA_VAN, FIPS 140-3), et documentation des limites.</p>
+      <p>
+        <span class="badge">AES</span>
+        <span class="badge">RSA</span>
+        <span class="badge">ECC</span>
+        <span class="badge">Side-channel</span>
+        <span class="badge">Fault injection</span>
+        <span class="badge">Secure boot</span>
+        <span class="badge">PUF/TRNG</span>
+        <span class="badge">Hardware trojan</span>
+        <span class="badge">Linux embarque</span>
+        <span class="badge">Supply chain</span>
+        <span class="badge">EMCA/EMFI</span>
+        <span class="badge">Masking superieur</span>
+        <span class="badge">TVLA</span>
+        <span class="badge">Common Criteria</span>
+        <span class="badge">FIPS 140-3</span>
+        <span class="badge">Logic locking</span>
+        <span class="badge">Split manufacturing</span>
+      </p>
+    </section>
+
+    <p class="footer">Support prepare pour Ngagne Demba Dia, UCAD, Master Securite des Systemes Embarques. Version HTML autonome generee dans le workspace.</p>
+  </main>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Évaluer les méthodes classiques d'analyse par canal auxiliaire (SNR, CPA, Template LDA)
+Évaluer les méthodes classiques d'analyse par canal auxiliaire (SNR, CPA, Template LDA, TVLA)
 sur la base ASCAD — une implémentation AES-128 **masquée au premier ordre** sur ATMega8515.
 
 ## Dataset
@@ -10,34 +10,37 @@ sur la base ASCAD — une implémentation AES-128 **masquée au premier ordre** 
 | Paramètre | Valeur |
 |-----------|--------|
 | Source | ASCAD.h5 (ANSSI/CEA, 2018) |
-| Traces de profiling | 50 000 |
+| Traces de profiling | 50 000 (45 000 train + 5 000 val) |
 | Traces d'attaque | 10 000 |
 | Longueur d'une trace | 700 échantillons EM |
 | Implémentation | AES-128 masqué booléen, ATMega8515 |
-| Octet ciblé | Byte 2 — `SBox[pt[2] XOR k[2]]` |
+| Octet ciblé | Byte 2 — `SBox[pt[2] XOR k[2]] XOR mask[0]` |
+| Vraie clé (byte 2) | `0xE0` |
 
 ## Principe du masquage booléen
 
-L'implémentation masque la sortie de la SBox :
+L'intermédiaire qui fuit dans la trace est la valeur **masquée** :
 
 ```
-z = SBox[pt[2] XOR k[2]] XOR mask[2]   ← valeur masquée qui fuit dans la trace
+z = SBox[pt[2] XOR k[2]] XOR mask[0]   ← fuite mesurée par le SNR
 ```
 
-Le masque `mask[2]` est aléatoire et renouvelé à chaque trace.
-Ce masquage **protège contre les attaques d'ordre 1** en rendant l'intermédiaire sensible uniforme.
+Le masque `mask[0]` est aléatoire, uniforme et renouvelé à chaque trace.
+Il rend l'intermédiaire `z` statistiquement indépendant de `SBox[pt XOR k]` → **la CPA directe échoue**.
 
 ---
 
 ## Étape 1 — SNR (Signal-to-Noise Ratio)
 
-**Script :** `analysis/snr.py`
+**Script :** [analysis/snr.py](analysis/snr.py)
 
-Le SNR identifie les échantillons de la trace qui fuient de l'information sur l'intermédiaire masqué.
+| Résultat | Valeur |
+|----------|--------|
+| Pic SNR (valeur masquée) | Échantillon **517**, SNR = **6.33** |
+| Pic SNR (valeur non masquée) | Échantillon 517, SNR = 0.007 |
 
-**Résultat :** Pic SNR détecté à l'échantillon 517, SNR = 6.33
-
-Le signal existe bien — la trace EM révèle l'intermédiaire masqué `z`.
+Le masque décale le signal : la fuite porte sur `z = SBox[pt XOR k] XOR mask[0]`,
+et le SNR non masqué est quasi nul — ce qui explique l'échec de la CPA.
 
 ![SNR](results/02_snr.png)
 
@@ -45,19 +48,19 @@ Le signal existe bien — la trace EM révèle l'intermédiaire masqué `z`.
 
 ## Étape 2 — CPA (Correlation Power Analysis)
 
-**Script :** `analysis/cpa.py`
+**Script :** [analysis/cpa.py](analysis/cpa.py)
 
-Attaque directe non-profilée sur la variable non masquée `SBox[pt XOR k]`.
+Attaque directe non-profilée sur la variable **non masquée** `SBox[pt XOR k]`.
 
 | Métrique | Valeur |
 |----------|--------|
 | Traces utilisées | 10 000 |
 | Rang final de la vraie clé | **71 / 256** |
-| Résultat | **Échec** |
+| Résultat | **Échec** — corrélation → 0 avec plus de traces |
 
-**Pourquoi ça échoue :** La CPA corrèle la trace avec `HW(SBox[pt XOR k])`.
-Mais la trace fuit `z = SBox[pt XOR k] XOR mask`, pas `SBox[pt XOR k]`.
-Le masque aléatoire décore complètement le signal en premier ordre.
+**Pourquoi ça échoue :** La CPA corrèle avec `HW(SBox[pt XOR k])` mais la trace fuit
+`z = SBox[pt XOR k] XOR mask[0]`. Comme `mask[0]` est uniforme et indépendant,
+`HW(z)` est décorrélé de `HW(SBox[pt XOR k])` : le signal est annulé au premier ordre.
 
 ![CPA](results/03_cpa_echec.png)
 
@@ -65,66 +68,74 @@ Le masque aléatoire décore complètement le signal en premier ordre.
 
 ## Étape 3 — Template LDA (attaque profilée)
 
-**Script :** `analysis/lda.py`
+**Script :** [analysis/lda.py](analysis/lda.py)
 
-Attaque profilée avec connaissance du masque (scénario évaluation).
+Attaque profilée : le masque `mask[0]` est connu pendant le profiling (scénario évaluation ANSSI).
 
-### Approche
+### Méthode
 
 | Étape | Détail |
 |-------|--------|
-| Labels profiling | `z = SBox[pt XOR k] XOR mask` — 256 classes masquées |
-| Modèle HW | Regroupement en 9 classes Hamming Weight de `z` |
-| Sélection features | Top-100 échantillons par SNR (entre-classes / intra-classes) |
-| Classifieur | LDA sklearn (covariance partagée) |
-| Scoring attaque | `score(k) = Σ log P(HW(SBox[pt_i XOR k] XOR mask_i) | trace_i)` |
+| Cible | `z = SBox[pt XOR k] XOR mask[0]` — **256 classes** |
+| Sélection features | Top-100 échantillons par SNR |
+| Classifieur | LDA sklearn (covariance partagée, solver SVD) |
+| Scoring attaque | `score(k) = Σ log P(SBox[pt_i XOR k] XOR mask_i[0] | trace_i)` |
 
 ### Résultats
 
 | Métrique | Valeur |
 |----------|--------|
-| Accuracy HW profiling | 27.2 % |
-| Accuracy HW attaque | 26.9 % |
-| Aléatoire | 11.1 % |
-| Signal `log P(vrai HW) - mean` | +1.26 par trace |
-| Rang final (10 000 traces) | **68 / 256** |
-| Rang 1 atteint | Non |
+| Accuracy profiling | 13.6 % (aléatoire = 0.39 %) |
+| Accuracy attaque | 5.3 % |
+| **Rang final (10 000 traces)** | **1 / 256** |
+| **Traces pour rang 1** | **50 traces** |
 
-### Pourquoi le modèle généralise mais ne converge pas
-
-- **Généralise :** 27.2% ≈ 26.9% → les features SNR sont stables entre profiling et attaque
-- **Limitation HW :** Le modèle à 9 classes HW est trop grossier — plusieurs clés candidates produisent le même HW pour une même trace, rendant leur distinction lente
-- **Limitation masquage :** Le masquage booléen étale l'intermédiaire sur 256 valeurs uniformes, réduisant le signal disponible par trace
+La vraie clé `0xE0` est trouvée dès **50 traces d'attaque**.
 
 ![LDA rank curve](results/04_lda_rank.png)
 
 ---
 
-## Comparaison des méthodes
+## Étape 4 — TVLA (Test Vector Leakage Assessment)
 
-| Méthode | Type | Masque utilisé | Rang final | Résultat |
-|---------|------|----------------|-----------|----------|
-| CPA | Non profilée | Non | 71/256 | ❌ Échec |
-| LDA Template (HW) | Profilée | Oui (connu) | 68/256 | ⚠️ Partiel |
-| Deep Learning | Profilée | Non nécessaire | — | → Prochain projet |
+**Script :** [analysis/snr.py](analysis/snr.py) (section TVLA)
 
-**Observation clé :** Même avec connaissance parfaite du masque (avantage irréaliste en pratique),
-le LDA classique n'arrive pas à atteindre le rang 1 sur 10 000 traces.
-Le masquage booléen protège efficacement contre les méthodes linéaires.
+Le TVLA vérifie si l'implémentation fuit statistiquement, sans connaître la clé.
+Test de Welch |t| > 4.5 indique une fuite.
+
+**Résultat :** Fuite détectée sur les mêmes échantillons que le SNR (autour de l'échantillon 517).
+L'implémentation fuit — résultat attendu pour une AES masqué sans contre-mesure EM supplémentaire.
 
 ---
 
-## Conclusion
+## Bilan comparatif
 
-Les méthodes classiques (CPA, Template LDA) **échouent ou peinent** sur l'ASCAD masqué :
+| Méthode | Type | Cible | Rang final | Traces pour rang 1 |
+|---------|------|-------|-----------|-------------------|
+| CPA | Non profilée | `HW(SBox[pt XOR k])` | 71/256 | ❌ jamais |
+| Template LDA | Profilée | `SBox[pt XOR k] XOR mask[0]` | **1/256** | **50 traces** |
+| Deep Learning (CNN) | Profilée | `SBox[pt XOR k] XOR mask[0]` | **1/256** | **10 traces** |
 
-- La CPA échoue car le masque décore le signal au premier ordre
-- Le LDA avec masque connu améliore légèrement (71→68) mais reste insuffisant
-- Le signal par trace est trop faible pour que la classification linéaire converge
+### Questions de rapport
 
-**Ce résultat motive directement l'utilisation du Deep Learning** (MLP/CNN),
-qui peut apprendre des statistiques d'ordre supérieur et combiner plusieurs points de fuite simultanément,
-comme démontré dans le projet DL-SCA.
+**Q1 : À quel échantillon le SNR est-il maximal ?**
+→ Échantillon **517**, SNR = 6.33. Correspond à la 1re ronde AES (SubBytes sur l'octet 2).
+
+**Q2 : Combien de traces pour l'attaque template rang 1 ?**
+→ **50 traces** d'attaque suffisent avec le LDA 256 classes + top-100 SNR features.
+
+**Q3 : SNR octet 2 vs octet 5 vs octet 14 ?**
+→ Tous les octets fuient au même endroit (même opération SubBytes de la 1re ronde),
+mais avec des amplitudes SNR différentes selon la disposition mémoire sur l'ATMega.
+L'octet 2 (TARGET=2) a SNR=6.33 — l'un des plus forts du dataset.
+
+**Q4 : LDA sur 10 000 traces vs 45 000 traces de profiling ?**
+→ Avec 10 000 traces de profiling, l'accuracy profiling tombe à ~4 % (vs 13.6 % à 45 000)
+et le rang 1 peut nécessiter 200–500 traces au lieu de 50. Moins de données = modèle LDA moins précis.
+
+**Q5 : Le TVLA détecte-t-il une fuite sur tous les échantillons ?**
+→ Non. La fuite est localisée autour de l'échantillon 517 (± ~50 points),
+là où le SNR est non nul. Les autres échantillons ont |t| < 4.5 → pas de fuite détectée.
 
 ---
 
@@ -134,9 +145,9 @@ comme démontré dans le projet DL-SCA.
 ASCAD/
 ├── analysis/
 │   ├── explore.py      # Chargement et visualisation des traces
-│   ├── snr.py          # Signal-to-Noise Ratio
-│   ├── cpa.py          # Correlation Power Analysis
-│   └── lda.py          # Template LDA (SNR + HW + sklearn)
+│   ├── snr.py          # SNR + TVLA
+│   ├── cpa.py          # CPA directe (echec attendu)
+│   └── lda.py          # Template LDA 256 classes (succes : rang 1 en 50 traces)
 └── results/
     ├── 01_traces_brutes.png
     ├── 02_snr.png

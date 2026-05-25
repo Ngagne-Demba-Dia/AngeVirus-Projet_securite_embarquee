@@ -1,12 +1,23 @@
+"""
+Template LDA — ASCAD octet TARGET
+Cible : SBox[pt XOR k] XOR mask[0]  (valeur masquee, 256 classes)
+Conforme au PDF section ASCAD etape 4.
+"""
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from pathlib import Path
 
-ASCAD_PATH = '/mnt/g/DATA/ascad/ASCAD_data/ASCAD_databases/ASCAD.h5'
-TARGET     = 2
-N_TRAIN    = 45000
-TOP_K      = 100   # nombre de samples SNR a conserver
+_CANDIDATES = [
+    Path('/mnt/g/DATA/ascad/ASCAD_data/ASCAD_databases/ASCAD.h5'),
+    Path('G:/DATA/ascad/ASCAD_data/ASCAD_databases/ASCAD.h5'),
+]
+ASCAD_PATH = next((p for p in _CANDIDATES if p.exists()), _CANDIDATES[0])
+
+TARGET  = 2
+N_TRAIN = 45000
+TOP_K   = 100   # features SNR retenues
 
 SBOX = np.array([
     0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
@@ -27,12 +38,12 @@ SBOX = np.array([
     0x8c,0xa1,0x89,0x0d,0xbf,0xe6,0x42,0x68,0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16,
 ], dtype=np.uint8)
 
-HW = np.array([bin(i).count('1') for i in range(256)], dtype=np.int64)
-
+# ── Chargement ────────────────────────────────────────────────────────────────
+print("Chargement ASCAD...")
 with h5py.File(ASCAD_PATH, 'r') as f:
-    X_prof  = f['Profiling_traces/traces'][:].astype(np.float64)
+    X_prof  = f['Profiling_traces/traces'][:].astype(np.float32)
     md_prof = f['Profiling_traces/metadata'][:]
-    X_att   = f['Attack_traces/traces'][:].astype(np.float64)
+    X_att   = f['Attack_traces/traces'][:].astype(np.float32)
     md_att  = f['Attack_traces/metadata'][:]
 
 pt_prof   = md_prof['plaintext']
@@ -42,20 +53,25 @@ pt_att    = md_att['plaintext']
 key_att   = md_att['key']
 mask_att  = md_att['masks']
 TRUE_KEY  = int(key_att[0, TARGET])
+print(f"Vraie cle octet {TARGET} : 0x{TRUE_KEY:02X}")
 
-# Labels masques 256 classes
-labels = np.array([
-    int(SBOX[int(pt_prof[i,TARGET]) ^ int(key_prof[i,TARGET])]) ^ int(mask_prof[i,TARGET])
+# ── Labels 256 classes — valeur masquee SBox[pt XOR k] XOR mask[0] ───────────
+# mask[0] est le masque actif sur l'octet 2 dans ASCAD (pas mask[TARGET=2])
+labels_prof = np.array([
+    int(SBOX[int(pt_prof[i, TARGET]) ^ int(key_prof[i, TARGET])]) ^ int(mask_prof[i, 0])
     for i in range(len(X_prof))
 ], dtype=np.int64)
 
-# Labels Hamming weight (9 classes — modele plus robuste)
-labels_hw = HW[labels]
+labels_att = np.array([
+    int(SBOX[int(pt_att[i, TARGET]) ^ int(key_att[i, TARGET])]) ^ int(mask_att[i, 0])
+    for i in range(len(X_att))
+], dtype=np.int64)
 
-# Selection par SNR (entre-classe / intra-classe) sur labels masques
-print("Calcul SNR pour selection des features...")
-X_tr = X_prof[:N_TRAIN]
-y_tr = labels[:N_TRAIN]
+# ── Selection SNR (top-K features) ───────────────────────────────────────────
+print("Selection SNR des features...")
+X_tr = X_prof[:N_TRAIN].astype(np.float64)
+y_tr = labels_prof[:N_TRAIN]
+
 class_means  = np.zeros((256, X_tr.shape[1]))
 class_counts = np.zeros(256)
 for c in range(256):
@@ -64,68 +80,60 @@ for c in range(256):
         class_means[c]  = X_tr[idx].mean(axis=0)
         class_counts[c] = idx.sum()
 grand_mean  = X_tr.mean(axis=0)
-between_var = (class_counts[:,None] * (class_means - grand_mean)**2).sum(axis=0) / N_TRAIN
+between_var = (class_counts[:, None] * (class_means - grand_mean)**2).sum(axis=0) / N_TRAIN
 within_var  = X_tr.var(axis=0) - between_var + 1e-10
 snr_vals    = between_var / within_var
 top_k       = np.argsort(-snr_vals)[:TOP_K]
 print(f"Sample SNR max : {top_k[0]}  SNR={snr_vals[top_k[0]]:.4f}")
-print(f"Top-{TOP_K} samples selectionnes")
 
 X_tr_sel  = X_tr[:, top_k]
-X_att_sel = X_att[:, top_k]
+X_att_sel = X_att[:, top_k].astype(np.float64)
 
-# LDA (covariance partagee, HW 9 classes) sur features SNR
-print(f"LDA (HW 9 classes) sur {N_TRAIN} traces, {TOP_K} features SNR...")
+# ── LDA 256 classes (valeur masquee complete) ─────────────────────────────────
+print(f"Entrainement LDA (256 classes) sur {N_TRAIN} traces, {TOP_K} features SNR...")
 lda = LinearDiscriminantAnalysis(solver='svd', store_covariance=False)
-lda.fit(X_tr_sel, labels_hw[:N_TRAIN])
+lda.fit(X_tr_sel, labels_prof[:N_TRAIN])
 print("Entrainement termine.")
 
-# Diagnostic accuracy
-preds_train = lda.predict(X_tr_sel[:2000])
-acc_train = (preds_train == labels_hw[:2000]).mean()
+acc_train = (lda.predict(X_tr_sel[:2000]) == labels_prof[:2000]).mean()
+acc_att   = (lda.predict(X_att_sel) == labels_att).mean()
+print(f"Accuracy (256 classes) — profiling : {acc_train*100:.1f}%  attaque : {acc_att*100:.1f}%"
+      f"  (aleatoire = {100/256:.2f}%)")
 
-labels_att_hw = HW[np.array([
-    int(SBOX[int(pt_att[i,TARGET]) ^ int(key_att[i,TARGET])]) ^ int(mask_att[i,TARGET])
-    for i in range(len(X_att))
-], dtype=np.int64)]
-preds_att = lda.predict(X_att_sel)
-acc_att = (preds_att == labels_att_hw).mean()
-print(f"Accuracy HW — profiling : {acc_train*100:.1f}%  attaque : {acc_att*100:.1f}%  (aleatoire = {100/9:.1f}%)")
-
-# Attaque : scoring HW sur 256 candidats cle
-print("Attaque sur 10000 traces...")
-log_p = lda.predict_log_proba(X_att_sel)  # (10000, 9)
+# ── Attaque : scoring log-vraisemblance sur 256 candidats cle ─────────────────
+# score(k) = sum_i log P(SBox[pt_i XOR k] XOR mask_i[0] | trace_i)
+print("Calcul des scores d'attaque...")
+log_p = lda.predict_log_proba(X_att_sel)  # (10000, 256)
 
 guesses  = np.arange(256, dtype=np.int64)
 pt_col   = pt_att[:, TARGET].astype(np.int64)
-mask_col = mask_att[:, TARGET].astype(np.int64)
-hw_inter = HW[(SBOX[(pt_col[:,None] ^ guesses[None,:]) & 0xFF].astype(np.int64) ^ mask_col[:,None]) & 0xFF]
-classes  = lda.classes_
-hw_idx   = np.searchsorted(classes, hw_inter)
-log_scores = np.take_along_axis(log_p, hw_idx, axis=1)
+mask_col = mask_att[:, 0].astype(np.int64)   # mask[0] — meme index que le profiling
+sbox_inter = (SBOX[(pt_col[:, None] ^ guesses[None, :]) & 0xFF].astype(np.int64)
+              ^ mask_col[:, None]) & 0xFF     # (10000, 256)
 
-true_lp = log_p[np.arange(len(X_att)), np.searchsorted(classes, labels_att_hw)].mean()
-print(f"Signal : log P(vrai HW) = {true_lp:.2f}  vs moyenne = {log_p.mean():.2f}")
+classes  = lda.classes_.astype(np.int64)
+sbox_idx = np.searchsorted(classes, sbox_inter)
+log_scores = np.take_along_axis(log_p, sbox_idx, axis=1)  # (10000, 256)
 
-# Courbe de rang
+# ── Courbe de rang ────────────────────────────────────────────────────────────
 step = 50
 ranks_n, ranks_v = [], []
 cumul = np.cumsum(log_scores, axis=0)
-for n in range(step, len(X_att)+1, step):
-    order = np.argsort(-cumul[n-1])
+for n in range(step, len(X_att) + 1, step):
+    order = np.argsort(-cumul[n - 1])
     ranks_n.append(n)
     ranks_v.append(int(np.where(order == TRUE_KEY)[0][0]) + 1)
 
-idx_rank1 = next((i for i,r in enumerate(ranks_v) if r==1), -1)
+idx_rank1 = next((i for i, r in enumerate(ranks_v) if r == 1), -1)
 print(f"Rang final ({len(X_att)} traces) : {ranks_v[-1]}/256")
 if idx_rank1 >= 0:
     print(f"Rang 1 atteint a : {ranks_n[idx_rank1]} traces")
 else:
-    print("Rang 1 non atteint sur 10000 traces")
+    print("Rang 1 non atteint sur 10 000 traces")
 
 plt.figure(figsize=(12, 5))
-plt.plot(ranks_n, ranks_v, color='darkgreen', linewidth=2, label='LDA Template (SNR+HW)')
-plt.axhline(1, color='red', linestyle='--', label='Rang 1 = cle retrouvee')
+plt.plot(ranks_n, ranks_v, color='darkgreen', linewidth=2, label='LDA Template (256 classes, SNR top-100)')
+plt.axhline(1, color='red', linestyle='--', linewidth=1.5, label='Rang 1 = cle retrouvee')
 plt.xlabel("Traces d'attaque utilisees")
 plt.ylabel("Rang de la vraie cle")
 plt.title(f"Template LDA — ASCAD octet {TARGET} — Vraie cle 0x{TRUE_KEY:02X}")

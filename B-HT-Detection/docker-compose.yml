@@ -1,0 +1,98 @@
+version: "3.9"
+
+# Stack MLOps locale :
+#   mlflow  → tracking server + model registry (port 5000)
+#   ht-api  → FastAPI inference (port 8000)
+#   pipeline → conteneur one-shot pour lancer les scripts de training
+
+services:
+
+  # ── MLflow tracking server ─────────────────────────────────────────────────
+  mlflow:
+    image: python:3.11-slim
+    container_name: ht-mlflow
+    command: >
+      bash -c "pip install mlflow==2.12.1 --quiet &&
+               mlflow server
+               --host 0.0.0.0
+               --port 5000
+               --backend-store-uri /mlflow/mlruns
+               --default-artifact-root /mlflow/artifacts"
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Pipeline ML (indexing + features + training) ───────────────────────────
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ht-pipeline
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONPATH=/app
+    volumes:
+      - /e/DATA/hardware_trojan:/data:ro      # dataset en lecture seule
+      - ./results:/app/results                  # outputs partagés avec l'API
+      - ./analysis:/app/analysis                # hot-reload du code
+      - ./configs:/app/configs
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    # Lancer manuellement : docker compose run pipeline python analysis/03_train.py
+    command: ["echo", "Pipeline pret. Utiliser: docker compose run pipeline python analysis/<script>.py"]
+
+  # ── FastAPI inference service ──────────────────────────────────────────────
+  ht-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: ht-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MODEL_DIR=/models
+      - SOURCE_BENCHMARK=AES-T400
+      - CONFIG_PATH=/app/configs/config.yaml
+      - PYTHONPATH=/app
+    volumes:
+      - ./results:/models:ro     # modèles entraînés (lecture seule)
+      - ./configs:/app/configs:ro
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mlflow_data:
+    driver: local
+
+# ── Usage rapide ────────────────────────────────────────────────────────────
+# Démarrer la stack :
+#   docker compose up -d mlflow ht-api
+#
+# Lancer le pipeline complet :
+#   docker compose run pipeline python analysis/01_indexer.py
+#   docker compose run pipeline python analysis/02_features.py
+#   docker compose run pipeline python analysis/03_train.py
+#   docker compose run pipeline python analysis/04_transfer.py
+#
+# Tester l'API :
+#   curl http://localhost:8000/health
+#   curl http://localhost:8000/model/info
+#
+# MLflow UI :
+#   http://localhost:5000

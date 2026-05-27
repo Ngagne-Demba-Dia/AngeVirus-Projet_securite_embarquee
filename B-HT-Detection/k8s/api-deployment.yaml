@@ -1,0 +1,89 @@
+---
+# FastAPI HT-Detection inference — expose /predict pour classification temps réel
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ht-api
+  namespace: ht-detection
+  labels:
+    app: ht-api
+    version: "v1.0"
+spec:
+  replicas: 2   # 2 pods pour la haute disponibilité
+  selector:
+    matchLabels:
+      app: ht-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ht-api
+    spec:
+      initContainers:
+        # Attendre que MLflow soit prêt avant de démarrer l'API
+        - name: wait-mlflow
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -sf http://mlflow-service:5000/health; do
+                echo "En attente de MLflow..."; sleep 5;
+              done
+              echo "MLflow disponible."
+
+      containers:
+        - name: ht-api
+          image: localhost:5001/ht-api:v1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MLFLOW_TRACKING_URI
+              value: "http://mlflow-service:5000"
+            - name: MODEL_DIR
+              value: "/models"
+            - name: SOURCE_BENCHMARK
+              value: "AES-T400"
+            - name: CONFIG_PATH
+              value: "/app/configs/config.yaml"
+            - name: PYTHONPATH
+              value: "/app"
+          volumeMounts:
+            - name: models-vol
+              mountPath: /models
+              readOnly: true
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+
+      volumes:
+        - name: models-vol
+          hostPath:
+            path: /run/desktop/mnt/host/c/Users/ngdia/Documents/securite_embarquee/B-HT-Detection/results
+            # Sur minikube : utiliser un PVC ou un ConfigMap pour les modèles
+
+      # Politique de redémarrage
+      restartPolicy: Always

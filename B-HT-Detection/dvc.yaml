@@ -1,0 +1,117 @@
+# dvc.yaml — Pipeline reproductible DVC
+# Usage :
+#   dvc repro              → rejoue tous les stages modifiés
+#   dvc repro train        → rejoue seulement train (+ ses dépendances)
+#   dvc dag                → affiche le graphe de dépendances
+#   dvc params diff        → montre quels paramètres ont changé
+#   dvc metrics show       → affiche les métriques courantes
+#   dvc metrics diff       → compare avec le commit précédent
+
+stages:
+
+  # ── Stage 1 : Indexation ───────────────────────────────────────────────────
+  index:
+    cmd: python analysis/01_indexer.py
+    deps:
+      - analysis/01_indexer.py
+      - configs/config.yaml
+      # Le dataset brut est sur E: — DVC surveille le dossier mais ne le copie pas
+    params:
+      - params.yaml:
+          - dataset.root
+          - dataset.input_methods
+    outs:
+      - results/index.parquet    # versionné par DVC (pas git)
+
+  # ── Stage 2 : Extraction de features ──────────────────────────────────────
+  features:
+    cmd: python analysis/02_features.py
+    deps:
+      - analysis/02_features.py
+      - results/index.parquet    # dépend du stage index
+    params:
+      - params.yaml:
+          - dataset.n_samples_per_class
+          - features.window_size
+          - features.n_fft
+    outs:
+      - results/features_AES-T400.npz
+      - results/features_AES-T500.npz
+      - results/features_AES-T600.npz
+      - results/features_AES-T700.npz
+      - results/features_AES-T800.npz
+      - results/features_AES-T1100.npz
+
+  # ── Stage 3 : Entraînement des modèles ────────────────────────────────────
+  train:
+    cmd: python analysis/03_train.py
+    deps:
+      - analysis/03_train.py
+      - results/features_AES-T400.npz
+      - results/features_AES-T500.npz
+    params:
+      - params.yaml:
+          - models.svm_c
+          - models.svm_kernel
+          - models.n_estimators_rf
+          - models.xgb_n_estimators
+          - models.xgb_learning_rate
+          - models.xgb_max_depth
+          - cnn.epochs
+          - cnn.batch_size
+          - cnn.lr
+          - cnn.dropout
+    outs:
+      - results/cnn1d_AES-T400.pt         # poids CNN — versionné
+      - results/scaler_mean_AES-T400.npy
+      - results/scaler_scale_AES-T400.npy
+      - results/model_comparison.csv
+    metrics:
+      - results/metrics.json:             # métriques DVC (dvc metrics show)
+          cache: false
+    plots:
+      - results/cm_CNN1D.png:
+          cache: false
+      - results/02_model_comparison.png:
+          cache: false
+
+  # ── Stage 4 : Transfer Learning ────────────────────────────────────────────
+  transfer:
+    cmd: python analysis/04_transfer.py
+    deps:
+      - analysis/04_transfer.py
+      - results/cnn1d_AES-T400.pt
+      - results/features_AES-T500.npz
+      - results/features_AES-T600.npz
+      - results/features_AES-T700.npz
+      - results/features_AES-T800.npz
+      - results/features_AES-T1100.npz
+    params:
+      - params.yaml:
+          - transfer.finetune_fraction
+          - transfer.finetune_epochs
+          - transfer.finetune_lr
+          - transfer.freeze_backbone
+    outs:
+      - results/cnn1d_ft_AES-T500.pt:
+          cache: true
+          persist: false
+    plots:
+      - results/03_domain_shift.png:
+          cache: false
+
+  # ── Stage 5 : Monitoring ────────────────────────────────────────────────────
+  monitor:
+    cmd: python analysis/05_monitor.py
+    deps:
+      - analysis/05_monitor.py
+      - results/cnn1d_AES-T400.pt
+      - results/index.parquet
+    params:
+      - params.yaml:
+          - monitor.window_traces
+          - monitor.alert_threshold
+          - monitor.inject_at
+    plots:
+      - results/04_monitor.png:
+          cache: false

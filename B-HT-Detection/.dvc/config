@@ -1,0 +1,9 @@
+[core]
+    autostage = true
+    analytics = false
+
+# Stockage local des données versionnées (features .npz, modèles .pt)
+# Pour un vrai projet : remplacer par S3/GCS/Azure
+[cache]
+    dir = .dvc/cache
+    type = symlink,hardlink,copy

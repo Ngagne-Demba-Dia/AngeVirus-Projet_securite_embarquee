@@ -1,0 +1,43 @@
+dataset:
+  root: "E:/DATA/hardware_trojan"
+  benchmarks:
+    source: "AES-T400"
+    targets: ["AES-T500", "AES-T600", "AES-T700", "AES-T800", "AES-T1100"]
+    all: ["AES-T400", "AES-T500", "AES-T600", "AES-T700", "AES-T800", "AES-T1100"]
+  n_samples_per_class: 2000   # par condition (Disabled/Enabled/Triggered) par méthode (_1/_2)
+  input_methods: [1, 2]
+
+features:
+  window_size: 100           # 2500 / 100 = 25 fenêtres
+  n_fft: 10                  # 10 premiers coef FFT par fenêtre
+  # Total features = 25 × (1 mean + 1 std + 1 energy + 10 fft) = 325
+
+models:
+  svm_c: 10.0
+  svm_kernel: "rbf"
+  n_estimators_rf: 100
+  xgb_n_estimators: 100
+  xgb_learning_rate: 0.1
+  xgb_max_depth: 6
+
+cnn:
+  epochs: 30
+  batch_size: 256
+  lr: 0.001
+  dropout: 0.3
+  # Architecture: Conv1d×3 (1→32→64→128) + AvgPool + FC
+
+transfer:
+  finetune_fraction: 0.10    # 10% du domaine cible pour fine-tuning
+  finetune_epochs: 10
+  finetune_lr: 0.0001
+  freeze_backbone: true      # geler les couches conv, entraîner seulement le classifieur
+
+monitor:
+  window_traces: 10          # classifier toutes les N traces
+  alert_threshold: 0.38      # confiance minimale pour déclencher une alerte
+  inject_at: 50              # injecter des traces Triggered à partir de l'index N
+
+mlflow:
+  experiment_name: "HT-Detection-Golden-Free"
+  tracking_uri: "results/mlruns"

@@ -1,0 +1,46 @@
+---
+# Service NodePort — expose l'API sur le port 30800 de l'hôte
+apiVersion: v1
+kind: Service
+metadata:
+  name: ht-api-service
+  namespace: ht-detection
+  labels:
+    app: ht-api
+spec:
+  selector:
+    app: ht-api
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80           # port interne au cluster
+      targetPort: 8000   # port du container FastAPI
+      nodePort: 30800    # port exposé sur le nœud (accès : http://localhost:30800)
+  type: NodePort
+---
+# HorizontalPodAutoscaler — scale automatiquement selon la charge CPU
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ht-api-hpa
+  namespace: ht-detection
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ht-api
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70    # scaler si CPU > 70%
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

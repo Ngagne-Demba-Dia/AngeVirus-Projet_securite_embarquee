@@ -1,0 +1,6 @@
+# Ne pas tracker les CSV bruts (360 000 fichiers) — trop volumineux
+# DVC track seulement les features extraites (.npz) et les modèles (.pt)
+results/mlruns/
+results/*.png
+__pycache__/
+*.pyc

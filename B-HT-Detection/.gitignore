@@ -1,0 +1,23 @@
+# Données et modèles lourds
+results/*.npz
+results/*.pt
+results/*.npy
+results/mlruns/
+results/*.png
+results/*.csv
+results/*.json
+results/*.txt
+results/*.parquet
+
+# Docker
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# DVC cache
+.dvc/cache/
+.dvc/tmp/
+
+# Jupyter
+.ipynb_checkpoints/

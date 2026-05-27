@@ -1,0 +1,342 @@
+// Jenkinsfile — CI/CD Pipeline HT-Detection MLOps
+// Déclenché : push sur main ou PR vers main
+// Stages : Build → Index → Features → Train → Quality Gate → Registry → Deploy K8s
+
+pipeline {
+
+    agent any  // ou agent { docker { image 'python:3.11-slim' } }
+
+    environment {
+        // MLflow
+        MLFLOW_TRACKING_URI    = "http://mlflow-service:5000"
+        MLFLOW_EXPERIMENT_NAME = "HT-Detection-Golden-Free"
+
+        // Docker
+        DOCKER_REGISTRY   = "localhost:5001"
+        IMAGE_PIPELINE    = "${DOCKER_REGISTRY}/ht-pipeline"
+        IMAGE_API         = "${DOCKER_REGISTRY}/ht-api"
+        IMAGE_TAG         = "${BUILD_NUMBER}"
+
+        // Kubernetes
+        KUBE_NAMESPACE    = "ht-detection"
+        KUBE_CONTEXT      = "docker-desktop"  // ou minikube
+
+        // Seuils qualité
+        MIN_ACCURACY      = "0.80"
+        MIN_F1            = "0.78"
+
+        // Chemins
+        DATASET_PATH      = "/e/DATA/hardware_trojan"
+        RESULTS_PATH      = "${WORKSPACE}/results"
+        ANALYSIS_PATH     = "${WORKSPACE}/analysis"
+    }
+
+    options {
+        timeout(time: 3, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+    }
+
+    stages {
+
+        // ── Stage 1 : Build Docker images ─────────────────────────────────────
+        stage('Build') {
+            steps {
+                echo "=== BUILD DOCKER IMAGES ==="
+                sh """
+                    docker build -t ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                                 -t ${IMAGE_PIPELINE}:latest \
+                                 -f Dockerfile .
+
+                    docker build -t ${IMAGE_API}:${IMAGE_TAG} \
+                                 -t ${IMAGE_API}:latest \
+                                 -f Dockerfile.api .
+                """
+            }
+            post {
+                success { echo "Images construites : ${IMAGE_PIPELINE}:${IMAGE_TAG}" }
+            }
+        }
+
+        // ── Stage 2 : Indexation du dataset ────────────────────────────────────
+        stage('Index Dataset') {
+            steps {
+                echo "=== INDEXATION CSV ==="
+                sh """
+                    docker run --rm \
+                        -v ${DATASET_PATH}:/data:ro \
+                        -v ${RESULTS_PATH}:/app/results \
+                        -v ${ANALYSIS_PATH}:/app/analysis \
+                        -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                        ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                        python analysis/01_indexer.py
+                """
+                archiveArtifacts artifacts: 'results/index.parquet', fingerprint: true
+            }
+        }
+
+        // ── Stage 3 : Extraction de features ──────────────────────────────────
+        stage('Extract Features') {
+            steps {
+                echo "=== EXTRACTION FEATURES (fenêtres 100pts, FFT10) ==="
+                sh """
+                    docker run --rm \
+                        -v ${DATASET_PATH}:/data:ro \
+                        -v ${RESULTS_PATH}:/app/results \
+                        -v ${ANALYSIS_PATH}:/app/analysis \
+                        -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                        ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                        python analysis/02_features.py
+                """
+            }
+            post {
+                success {
+                    sh "ls -lh ${RESULTS_PATH}/features_*.npz"
+                }
+            }
+        }
+
+        // ── Stage 4 : Entraînement des modèles ────────────────────────────────
+        stage('Train Models') {
+            steps {
+                echo "=== TRAINING SVM / RF / XGBoost / CNN1D ==="
+                sh """
+                    docker run --rm \
+                        -v ${RESULTS_PATH}:/app/results \
+                        -v ${ANALYSIS_PATH}:/app/analysis \
+                        -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                        ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                        python analysis/03_train.py
+                """
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'results/cm_*.png, results/*.png', fingerprint: true
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'results',
+                        reportFiles: 'model_comparison.csv',
+                        reportName: 'Model Comparison'
+                    ])
+                }
+            }
+        }
+
+        // ── Stage 5 : Transfer Learning ────────────────────────────────────────
+        stage('Transfer Learning') {
+            steps {
+                echo "=== DOMAIN SHIFT + FINE-TUNING ==="
+                sh """
+                    docker run --rm \
+                        -v ${RESULTS_PATH}:/app/results \
+                        -v ${ANALYSIS_PATH}:/app/analysis \
+                        -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                        ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                        python analysis/04_transfer.py
+                """
+                archiveArtifacts artifacts: 'results/03_domain_shift.png', fingerprint: true
+            }
+        }
+
+        // ── Stage 6 : Quality Gate ─────────────────────────────────────────────
+        stage('Quality Gate') {
+            steps {
+                echo "=== QUALITY GATE — seuil accuracy=${MIN_ACCURACY} F1=${MIN_F1} ==="
+                script {
+                    // Lire les métriques depuis model_comparison.csv
+                    def csvContent = sh(
+                        script: "cat ${RESULTS_PATH}/model_comparison.csv",
+                        returnStdout: true
+                    ).trim()
+                    echo "model_comparison.csv:\n${csvContent}"
+
+                    def bestAccuracy = sh(
+                        script: """python3 -c "
+import csv, sys
+rows = list(csv.DictReader(open('${RESULTS_PATH}/model_comparison.csv')))
+best = max(float(r['Accuracy']) for r in rows)
+print(f'{best:.4f}')
+" """,
+                        returnStdout: true
+                    ).trim().toFloat()
+
+                    echo "Meilleure accuracy : ${bestAccuracy}"
+
+                    if (bestAccuracy < MIN_ACCURACY.toFloat()) {
+                        error("""
+QUALITY GATE FAILED
+Accuracy = ${bestAccuracy} < seuil = ${MIN_ACCURACY}
+Déploiement bloqué — vérifier les données ou les hyperparamètres.
+""")
+                    }
+
+                    // Écrire pour les stages suivants
+                    sh "echo ${bestAccuracy} > ${RESULTS_PATH}/best_accuracy.txt"
+                    env.BEST_ACCURACY = bestAccuracy.toString()
+                }
+            }
+        }
+
+        // ── Stage 7 : MLflow Model Registry ────────────────────────────────────
+        stage('Register Model') {
+            steps {
+                echo "=== ENREGISTREMENT MODELE DANS MLFLOW REGISTRY ==="
+                sh """
+                    docker run --rm \
+                        -v ${RESULTS_PATH}:/app/results \
+                        -v ${ANALYSIS_PATH}:/app/analysis \
+                        -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                        ${IMAGE_PIPELINE}:${IMAGE_TAG} \
+                        python -c "
+import mlflow, os
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient()
+experiment = client.get_experiment_by_name('${MLFLOW_EXPERIMENT_NAME}')
+runs = client.search_runs(
+    experiment_ids=[experiment.experiment_id],
+    filter_string='metrics.accuracy > ${MIN_ACCURACY}',
+    order_by=['metrics.accuracy DESC'],
+    max_results=1,
+)
+if not runs:
+    raise RuntimeError('Aucun run au-dessus du seuil')
+
+best_run = runs[0]
+run_id   = best_run.info.run_id
+acc      = best_run.data.metrics['accuracy']
+model    = best_run.data.params.get('model', 'unknown')
+print(f'Meilleur run : {run_id}  model={model}  accuracy={acc:.4f}')
+
+# Enregistrer dans le Registry
+result = mlflow.register_model(
+    model_uri=f'runs:/{run_id}/{model}',
+    name='HT-Detector',
+)
+print(f'Version enregistrée : {result.version}')
+
+# Promouvoir en Production si accuracy > 0.90
+if acc >= 0.90:
+    client.transition_model_version_stage(
+        name='HT-Detector',
+        version=result.version,
+        stage='Production',
+    )
+    print(f'Promue en Production (acc={acc:.4f})')
+else:
+    client.transition_model_version_stage(
+        name='HT-Detector',
+        version=result.version,
+        stage='Staging',
+    )
+    print(f'Promue en Staging (acc={acc:.4f} < 0.90)')
+"
+                """
+            }
+        }
+
+        // ── Stage 8 : Push images Docker ───────────────────────────────────────
+        stage('Push Images') {
+            steps {
+                echo "=== PUSH IMAGES VERS REGISTRY ==="
+                sh """
+                    docker push ${IMAGE_PIPELINE}:${IMAGE_TAG}
+                    docker push ${IMAGE_PIPELINE}:latest
+                    docker push ${IMAGE_API}:${IMAGE_TAG}
+                    docker push ${IMAGE_API}:latest
+                """
+            }
+        }
+
+        // ── Stage 9 : Deploy Kubernetes ────────────────────────────────────────
+        stage('Deploy K8s') {
+            steps {
+                echo "=== DEPLOIEMENT KUBERNETES ==="
+                sh """
+                    # Créer le namespace si nécessaire
+                    kubectl --context=${KUBE_CONTEXT} \
+                        create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml | \
+                        kubectl apply -f -
+
+                    # Mettre à jour le tag de l'image dans les manifests
+                    sed -i 's|IMAGE_TAG_PLACEHOLDER|${IMAGE_TAG}|g' k8s/api-deployment.yaml
+
+                    # Appliquer les manifests
+                    kubectl --context=${KUBE_CONTEXT} -n ${KUBE_NAMESPACE} \
+                        apply -f k8s/
+
+                    # Attendre que le rollout se termine
+                    kubectl --context=${KUBE_CONTEXT} -n ${KUBE_NAMESPACE} \
+                        rollout status deployment/ht-api --timeout=5m
+
+                    # Vérifier les pods
+                    kubectl --context=${KUBE_CONTEXT} -n ${KUBE_NAMESPACE} \
+                        get pods -l app=ht-api
+                """
+            }
+            post {
+                success {
+                    echo "API déployée sur K8s. Port: 30800 (NodePort)"
+                }
+            }
+        }
+
+        // ── Stage 10 : Smoke Test ──────────────────────────────────────────────
+        stage('Smoke Test') {
+            steps {
+                echo "=== SMOKE TEST API ==="
+                sh """
+                    sleep 10  # attendre que les pods soient prêts
+
+                    # Health check
+                    curl -f http://localhost:30800/health && echo "Health OK"
+
+                    # Ready check
+                    curl -f http://localhost:30800/ready && echo "Ready OK"
+
+                    # Model info
+                    curl -s http://localhost:30800/model/info | python3 -m json.tool
+
+                    # Test predict avec une trace synthétique
+                    python3 -c "
+import json, urllib.request
+samples = [float(i % 50) for i in range(2500)]
+data = json.dumps({'samples': samples}).encode()
+req = urllib.request.Request(
+    'http://localhost:30800/predict',
+    data=data,
+    headers={'Content-Type': 'application/json'},
+)
+resp = json.loads(urllib.request.urlopen(req).read())
+print('Predict response:', json.dumps(resp, indent=2))
+assert resp['state'] in ['TrojanDisabled', 'TrojanEnabled', 'TrojanTriggered']
+print('Smoke test PASSED')
+"
+                """
+            }
+        }
+    }
+
+    // ── Post-actions ────────────────────────────────────────────────────────────
+    post {
+        success {
+            echo """
+=== PIPELINE REUSSI ===
+Image       : ${IMAGE_API}:${IMAGE_TAG}
+Accuracy    : ${env.BEST_ACCURACY}
+MLflow UI   : http://localhost:5000
+API         : http://localhost:30800
+MLflow Docs : http://localhost:5000/#/models/HT-Detector
+"""
+        }
+        failure {
+            echo "=== PIPELINE ECHOUE — voir les logs ci-dessus ==="
+        }
+        always {
+            // Nettoyage images intermédiaires
+            sh "docker image prune -f --filter label=stage=builder || true"
+        }
+    }
+}

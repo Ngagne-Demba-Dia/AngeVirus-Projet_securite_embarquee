@@ -1,0 +1,36 @@
+# params.yaml — paramètres suivis par DVC
+# Tout changement ici invalide les stages DVC concernés → dvc repro les relance
+
+dataset:
+  root: "E:/DATA/hardware_trojan"
+  n_samples_per_class: 2000
+  input_methods: [1, 2]
+
+features:
+  window_size: 100
+  n_fft: 10
+
+models:
+  svm_c: 10.0
+  svm_kernel: "rbf"
+  n_estimators_rf: 100
+  xgb_n_estimators: 100
+  xgb_learning_rate: 0.1
+  xgb_max_depth: 6
+
+cnn:
+  epochs: 30
+  batch_size: 256
+  lr: 0.001
+  dropout: 0.3
+
+transfer:
+  finetune_fraction: 0.10
+  finetune_epochs: 10
+  finetune_lr: 0.0001
+  freeze_backbone: true
+
+monitor:
+  window_traces: 10
+  alert_threshold: 0.80
+  inject_at: 50

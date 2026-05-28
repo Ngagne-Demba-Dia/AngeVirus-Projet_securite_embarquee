@@ -41,8 +41,11 @@ LABEL_RISK  = {"TrojanDisabled": "OK", "TrojanEnabled": "WARNING", "TrojanTrigge
 app = FastAPI(
     title="HT-Detection API",
     description="Golden-free Hardware Trojan detection via power side-channel ML",
-    version="1.0.0",
+    version="1.1.0",
 )
+
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app)
 
 # ── État global ────────────────────────────────────────────────────────────────
 state = {
@@ -108,6 +111,30 @@ class PredictResponse(BaseModel):
     confidence: float
     latency_ms: float
 
+class FeatureContrib(BaseModel):
+    rank:       int
+    name:       str
+    importance: float
+    value:      float
+
+class ExplainResponse(BaseModel):
+    label:        int
+    state:        str
+    risk:         str
+    confidence:   float
+    top_features: list[FeatureContrib]
+    latency_ms:   float
+
+
+# ── Noms des 325 features (25 fenêtres × 13 : mean, std, energy, fft×10) ─────
+def _feature_names(window_size: int = 100, n_fft: int = 10) -> list[str]:
+    n_windows = 2500 // window_size
+    names = []
+    for w in range(n_windows):
+        names += [f"w{w}_mean", f"w{w}_std", f"w{w}_energy"]
+        names += [f"w{w}_fft{k}" for k in range(n_fft)]
+    return names
+
 
 # ── Fonction d'inference ───────────────────────────────────────────────────────
 def _infer(samples: list[float]) -> dict:
@@ -133,6 +160,48 @@ def _infer(samples: list[float]) -> dict:
         "state":      LABEL_NAMES[label],
         "risk":       LABEL_RISK[LABEL_NAMES[label]],
         "confidence": float(probs[label]),
+    }
+
+
+# ── Attribution par gradient (saliency map sur le CNN) ────────────────────────
+def _gradient_explain(samples: list[float], top_n: int = 10) -> dict:
+    if state["model"] is None:
+        raise HTTPException(status_code=503, detail="Modèle non chargé")
+
+    cfg = state["cfg"]["features"]
+    trace = np.array(samples, dtype=np.float32)
+    feat = extract_features(trace, window=cfg["window_size"], n_fft=cfg["n_fft"])
+
+    X = state["scaler"].transform(feat.reshape(1, -1))
+    X_t = torch.FloatTensor(X).requires_grad_(True)
+
+    state["model"].zero_grad()
+    with torch.enable_grad():
+        logits = state["model"](X_t)
+        probs = torch.softmax(logits, dim=1).detach().numpy()[0]
+        label = int(probs.argmax())
+        logits[0, label].backward()
+
+    importance = X_t.grad[0].abs().detach().numpy()
+    feat_names = _feature_names(cfg["window_size"], cfg["n_fft"])
+
+    top_idx = importance.argsort()[::-1][:top_n]
+    top_features = [
+        {
+            "rank": int(r + 1),
+            "name": feat_names[i],
+            "importance": round(float(importance[i]), 6),
+            "value": round(float(feat[i]), 4),
+        }
+        for r, i in enumerate(top_idx)
+    ]
+
+    return {
+        "label":        label,
+        "state":        LABEL_NAMES[label],
+        "risk":         LABEL_RISK[LABEL_NAMES[label]],
+        "confidence":   round(float(probs[label]), 4),
+        "top_features": top_features,
     }
 
 
@@ -203,6 +272,18 @@ def predict_batch(req: BatchRequest):
         "predictions":   results,
         "latency_ms":    round((time.perf_counter() - t0) * 1000, 2),
     }
+
+
+@app.post("/explain", response_model=ExplainResponse, tags=["Inference"])
+def explain(req: TraceRequest):
+    """
+    Classifier une trace et expliquer la décision par attribution de gradient.
+    Retourne les 10 features ayant le plus influencé la prédiction du CNN.
+    """
+    t0 = time.perf_counter()
+    result = _gradient_explain(req.samples)
+    result["latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
+    return result
 
 
 # ── Lancement local ────────────────────────────────────────────────────────────

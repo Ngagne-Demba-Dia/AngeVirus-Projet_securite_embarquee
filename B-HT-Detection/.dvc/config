@@ -1,9 +1,12 @@
 [core]
     autostage = true
     analytics = false
-
-# Stockage local des données versionnées (features .npz, modèles .pt)
-# Pour un vrai projet : remplacer par S3/GCS/Azure
+    remote = gdrive
 [cache]
     dir = .dvc/cache
-    type = symlink,hardlink,copy
+    type = symlink, hardlink, copy
+['remote "gdrive"']
+    url = gdrive://1Om-W5rfeRqLfTnU-XQSjOMo4qtI4c6uD
+    gdrive_acknowledge_abuse = true
+    gdrive_client_id = 997565165549-73dg2ue9v4j27s8i8os5gc5gh4ko0585.apps.googleusercontent.com
+    gdrive_client_secret = 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

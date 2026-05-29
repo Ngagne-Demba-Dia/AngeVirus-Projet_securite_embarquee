@@ -1,0 +1,54 @@
+cmd: python analysis/04_transfer.py
+deps:
+- path: analysis/04_transfer.py
+  hash: md5
+  md5: facdbad91355dabb9a0bcaf9bd78fb62
+  size: 7167
+  isexec: true
+- path: results/cnn1d_AES-T400.pt
+  hash: md5
+  md5: af46f647f3b1c9394347a34ce1960316
+  size: 2302073
+  isexec: true
+- path: results/features_AES-T1100.npz
+  hash: md5
+  md5: 0cf08ef245e92c2f940b50829d8d8cdc
+  size: 13365914
+  isexec: true
+- path: results/features_AES-T500.npz
+  hash: md5
+  md5: 34a8ac409a872386ba92d027cce6129e
+  size: 13373422
+  isexec: true
+- path: results/features_AES-T600.npz
+  hash: md5
+  md5: 048188d7d818e025402cbe254c1e457c
+  size: 13438004
+  isexec: true
+- path: results/features_AES-T700.npz
+  hash: md5
+  md5: 0fbdbc0cbf8cb2fee9f26d839a4c442b
+  size: 13296235
+  isexec: true
+- path: results/features_AES-T800.npz
+  hash: md5
+  md5: 5999526a6e86adf2a9edee8016c7cae0
+  size: 13347912
+  isexec: true
+params:
+  params.yaml:
+    transfer.finetune_epochs: 10
+    transfer.finetune_fraction: 0.1
+    transfer.finetune_lr: 0.0001
+    transfer.freeze_backbone: true
+outs:
+- path: results/03_domain_shift.png
+  hash: md5
+  md5: a136245480c025cc20cf5a3f42fd5cb7
+  size: 67151
+  isexec: true
+- path: results/cnn1d_ft_AES-T500.pt
+  hash: md5
+  md5: 15ea67adcf560f4e11e0f3e6f53a5b83
+  size: 2302172
+  isexec: true

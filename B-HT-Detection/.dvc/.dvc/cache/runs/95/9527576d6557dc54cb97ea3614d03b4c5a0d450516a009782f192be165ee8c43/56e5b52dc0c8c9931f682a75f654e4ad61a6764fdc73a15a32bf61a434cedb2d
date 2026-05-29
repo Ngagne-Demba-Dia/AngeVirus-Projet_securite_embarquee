@@ -1,0 +1,24 @@
+cmd: python analysis/01_indexer.py
+deps:
+- path: analysis/01_indexer.py
+  hash: md5
+  md5: 2c50d633c2d3fa3382342a055f01eae7
+  size: 2833
+  isexec: true
+- path: configs/config.yaml
+  hash: md5
+  md5: c8fc7f9d6fb816c7031f681279bcd171
+  size: 1359
+  isexec: true
+params:
+  params.yaml:
+    dataset.input_methods:
+    - 1
+    - 2
+    dataset.root: E:/DATA/hardware_trojan
+outs:
+- path: results/index.parquet
+  hash: md5
+  md5: 8bc87c3d39711207ab80000e0c211e87
+  size: 3996081
+  isexec: true

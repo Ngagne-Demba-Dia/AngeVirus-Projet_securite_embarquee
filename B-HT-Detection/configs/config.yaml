@@ -9,8 +9,8 @@ dataset:
 
 features:
   window_size: 100           # 2500 / 100 = 25 fenêtres
-  n_fft: 10                  # 10 premiers coef FFT par fenêtre
-  # Total features = 25 × (1 mean + 1 std + 1 energy + 10 fft) = 325
+  n_fft: 15                  # 15 premiers coef FFT par fenêtre
+  # Total features = 25 × (mean + std + energy + kurtosis + skewness + 15 fft) = 500
 
 models:
   svm_c: 10.0
@@ -21,17 +21,17 @@ models:
   xgb_max_depth: 6
 
 cnn:
-  epochs: 30
+  epochs: 50
   batch_size: 256
   lr: 0.001
   dropout: 0.3
   # Architecture: Conv1d×3 (1→32→64→128) + AvgPool + FC
 
 transfer:
-  finetune_fraction: 0.10    # 10% du domaine cible pour fine-tuning
-  finetune_epochs: 10
-  finetune_lr: 0.0001
-  freeze_backbone: true      # geler les couches conv, entraîner seulement le classifieur
+  finetune_fraction: 0.20    # 20% du domaine cible pour fine-tuning
+  finetune_epochs: 30
+  finetune_lr: 0.00005
+  freeze_backbone: false     # dégeler tout le réseau pour meilleure adaptation
 
 monitor:
   window_traces: 10          # classifier toutes les N traces

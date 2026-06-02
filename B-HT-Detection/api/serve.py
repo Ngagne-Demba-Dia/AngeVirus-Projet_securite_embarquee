@@ -70,18 +70,32 @@ def load_model():
         log.warning(f"Config non trouvée ({CONF_FILE}) — utilisation des defaults")
         state["cfg"] = {"features": {"window_size": 100, "n_fft": 10}}
 
-    weights = MODEL_DIR / f"cnn1d_{SRC_BM}.pt"
-    mean_f  = MODEL_DIR / f"scaler_mean_{SRC_BM}.npy"
-    scale_f = MODEL_DIR / f"scaler_scale_{SRC_BM}.npy"
+    # Priorité : CORAL T800 > CORAL T700 > fine-tuned T700 > source T400
+    candidates = [
+        ("cnn1d_coral_AES-T800.pt", "scaler_ms_mean_AES-T800.npy",  "scaler_ms_scale_AES-T800.npy",  "CORAL_T800"),
+        ("cnn1d_coral_AES-T700.pt", "scaler_ms_mean_AES-T700.npy",  "scaler_ms_scale_AES-T700.npy",  "CORAL_T700"),
+        ("cnn1d_ft_AES-T700.pt",    f"scaler_mean_{SRC_BM}.npy",    f"scaler_scale_{SRC_BM}.npy",    "FT_T700"),
+        (f"cnn1d_{SRC_BM}.pt",      f"scaler_mean_{SRC_BM}.npy",    f"scaler_scale_{SRC_BM}.npy",    SRC_BM),
+    ]
 
-    if not weights.exists():
-        log.error(f"Modèle non trouvé : {weights}")
+    weights, mean_f, scale_f, model_id = None, None, None, None
+    for w, m, s, mid in candidates:
+        if (MODEL_DIR / w).exists() and (MODEL_DIR / m).exists():
+            weights, mean_f, scale_f, model_id = MODEL_DIR/w, MODEL_DIR/m, MODEL_DIR/s, mid
+            break
+
+    if weights is None:
+        log.error("Aucun modèle trouvé dans MODEL_DIR")
         return
 
     model = CNN1D()
-    model.load_state_dict(torch.load(weights, map_location="cpu"))
+    # Filtrer les clés incompatibles (ex: _flatten du wrapper CORAL)
+    sd = {k: v for k, v in torch.load(weights, map_location="cpu").items()
+          if k in model.state_dict()}
+    model.load_state_dict(sd, strict=False)
     model.eval()
-    state["model"] = model
+    state["model"]     = model
+    state["source_bm"] = model_id
 
     scaler = StandardScaler()
     scaler.mean_  = np.load(mean_f)
@@ -91,7 +105,7 @@ def load_model():
     state["scaler"] = scaler
 
     state["loaded_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    log.info(f"Modèle chargé : {weights}  (source: {SRC_BM})")
+    log.info(f"Modèle chargé : {weights.name}  (id: {model_id})")
 
 
 # ── Schemas Pydantic ───────────────────────────────────────────────────────────

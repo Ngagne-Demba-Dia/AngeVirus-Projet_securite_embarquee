@@ -70,8 +70,9 @@ def load_model():
         log.warning(f"Config non trouvée ({CONF_FILE}) — utilisation des defaults")
         state["cfg"] = {"features": {"window_size": 100, "n_fft": 10}}
 
-    # Priorité : CORAL T800 > CORAL T700 > fine-tuned T700 > source T400
+    # Priorité : AT_T800 > CORAL T800 > CORAL T700 > fine-tuned T700 > source T400
     candidates = [
+        ("cnn1d_AT_AES-T800.pt",    "scaler_ms_mean_AES-T800.npy",  "scaler_ms_scale_AES-T800.npy",  "AT_T800"),
         ("cnn1d_coral_AES-T800.pt", "scaler_ms_mean_AES-T800.npy",  "scaler_ms_scale_AES-T800.npy",  "CORAL_T800"),
         ("cnn1d_coral_AES-T700.pt", "scaler_ms_mean_AES-T700.npy",  "scaler_ms_scale_AES-T700.npy",  "CORAL_T700"),
         ("cnn1d_ft_AES-T700.pt",    f"scaler_mean_{SRC_BM}.npy",    f"scaler_scale_{SRC_BM}.npy",    "FT_T700"),

@@ -140,6 +140,22 @@ class ExplainResponse(BaseModel):
     top_features: list[FeatureContrib]
     latency_ms:   float
 
+class UncertainResponse(BaseModel):
+    label:       int
+    state:       str
+    risk:        str
+    confidence:  float
+    epistemic:   float   # variance MC Dropout — incertitude épistémique
+    entropy:     float   # entropie prédictive
+    is_uncertain: bool   # True si incertitude > seuil
+    decision:    str     # "PREDICT" ou "UNCERTAIN"
+    n_passes:    int
+    latency_ms:  float
+
+# Seuil MC Dropout calibré sur T700 in-domain (75e percentile)
+MC_UNCERTAINTY_THRESHOLD = 0.00046
+MC_N_PASSES = 20   # 20 passes en production (équilibre latence/précision)
+
 
 # ── Noms des 325 features (25 fenêtres × 13 : mean, std, energy, fft×10) ─────
 def _feature_names(window_size: int = 100, n_fft: int = 10) -> list[str]:
@@ -287,6 +303,66 @@ def predict_batch(req: BatchRequest):
         "predictions":   results,
         "latency_ms":    round((time.perf_counter() - t0) * 1000, 2),
     }
+
+
+def _mc_infer(samples: list[float], n_passes: int) -> dict:
+    """Monte Carlo Dropout : N passes forward avec Dropout actif."""
+    if state["model"] is None:
+        raise HTTPException(status_code=503, detail="Modèle non chargé")
+
+    cfg   = state["cfg"]["features"]
+    trace = np.array(samples, dtype=np.float32)
+    feat  = extract_features(trace, window=cfg["window_size"], n_fft=cfg["n_fft"])
+    X     = state["scaler"].transform(feat.reshape(1, -1))
+    X_t   = torch.FloatTensor(X)
+
+    # Activer Dropout en inférence
+    model = state["model"]
+    model.eval()
+    for module in model.modules():
+        if hasattr(module, 'p') and hasattr(module, 'training'):
+            if 'Dropout' in type(module).__name__:
+                module.train()
+
+    all_probs = []
+    with torch.no_grad():
+        for _ in range(n_passes):
+            probs = torch.softmax(model(X_t), dim=1).numpy()[0]
+            all_probs.append(probs)
+
+    model.eval()   # remettre en eval complet
+    all_probs  = np.array(all_probs)
+    mean_probs = all_probs.mean(axis=0)
+    epistemic  = float(all_probs.var(axis=0).mean())
+    entropy    = float(-np.sum(mean_probs * np.log(mean_probs + 1e-8)))
+    label      = int(mean_probs.argmax())
+    state["n_predict"] += 1
+
+    return {
+        "label":       label,
+        "state":       LABEL_NAMES[label],
+        "risk":        LABEL_RISK[LABEL_NAMES[label]],
+        "confidence":  round(float(mean_probs[label]), 4),
+        "epistemic":   round(epistemic, 6),
+        "entropy":     round(entropy, 4),
+        "is_uncertain": epistemic > MC_UNCERTAINTY_THRESHOLD,
+        "decision":    "UNCERTAIN" if epistemic > MC_UNCERTAINTY_THRESHOLD else "PREDICT",
+    }
+
+
+@app.post("/predict/uncertain", response_model=UncertainResponse, tags=["Inference"])
+def predict_uncertain(req: TraceRequest):
+    """
+    Prédiction avec quantification d'incertitude (Monte Carlo Dropout).
+    Si is_uncertain=True, la prédiction est peu fiable — domaine probablement inconnu.
+    """
+    t0 = time.perf_counter()
+    result = _mc_infer(req.samples, MC_N_PASSES)
+    result["n_passes"]   = MC_N_PASSES
+    result["latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
+    if result["is_uncertain"]:
+        log.warning(f"UNCERTAIN détecté! epistemic={result['epistemic']:.6f}")
+    return result
 
 
 @app.post("/explain", response_model=ExplainResponse, tags=["Inference"])

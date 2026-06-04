@@ -1,0 +1,48 @@
+cmd: python analysis/02_features.py
+deps:
+- path: analysis/02_features.py
+  hash: md5
+  md5: a3e2901e6aa3c85fd7b958f093e0ca83
+  size: 2187
+  isexec: true
+- path: results/index.parquet
+  hash: md5
+  md5: 8bc87c3d39711207ab80000e0c211e87
+  size: 3996081
+  isexec: true
+params:
+  params.yaml:
+    dataset.n_samples_per_class: 2000
+    features.n_fft: 10
+    features.window_size: 100
+outs:
+- path: results/features_AES-T1100.npz
+  hash: md5
+  md5: fba3b7f955c1d7e15aa55d521e5fa53b
+  size: 21518168
+  isexec: true
+- path: results/features_AES-T400.npz
+  hash: md5
+  md5: 74600be68aed0d525f88b994a323ea09
+  size: 21531115
+  isexec: true
+- path: results/features_AES-T500.npz
+  hash: md5
+  md5: 956ef08e40768b10ae0e15031c201cde
+  size: 21525548
+  isexec: true
+- path: results/features_AES-T600.npz
+  hash: md5
+  md5: 295949ba72494341369e687c7594a622
+  size: 21573132
+  isexec: true
+- path: results/features_AES-T700.npz
+  hash: md5
+  md5: 9df80ab28189af99566306afde7e4194
+  size: 21449836
+  isexec: true
+- path: results/features_AES-T800.npz
+  hash: md5
+  md5: 034df178624ec4c4a950228ebf28a9d7
+  size: 21489023
+  isexec: true

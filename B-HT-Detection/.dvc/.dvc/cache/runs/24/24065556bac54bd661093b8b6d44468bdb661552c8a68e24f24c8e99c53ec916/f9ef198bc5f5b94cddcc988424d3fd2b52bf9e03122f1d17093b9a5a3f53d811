@@ -1,0 +1,28 @@
+cmd: python analysis/05_monitor.py
+deps:
+- path: analysis/05_monitor.py
+  hash: md5
+  md5: 7dbca8a6e92629929f7be94ee20a9f93
+  size: 8972
+  isexec: true
+- path: results/cnn1d_AES-T400.pt
+  hash: md5
+  md5: f2291c906a50e0b53e91b5af705e555b
+  size: 2302073
+  isexec: true
+- path: results/index.parquet
+  hash: md5
+  md5: 8bc87c3d39711207ab80000e0c211e87
+  size: 3996081
+  isexec: true
+params:
+  params.yaml:
+    monitor.alert_threshold: 0.8
+    monitor.inject_at: 50
+    monitor.window_traces: 10
+outs:
+- path: results/04_monitor.png
+  hash: md5
+  md5: 9800e5eac8c51a30f4c02dd60affb592
+  size: 111346
+  isexec: true

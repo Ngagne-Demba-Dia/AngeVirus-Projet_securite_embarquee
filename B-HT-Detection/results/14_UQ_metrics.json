@@ -1,0 +1,38 @@
+{
+  "model": "AT_AES-T800",
+  "n_passes": 50,
+  "threshold": 0.000465,
+  "threshold_percentile": 75,
+  "benchmarks": {
+    "AES-T700": {
+      "accuracy": 0.663,
+      "epistemic_mean": 0.000305,
+      "epistemic_std": 0.000309,
+      "entropy_mean": 0.4623,
+      "frac_uncertain": 0.25,
+      "acc_certain": 0.7148,
+      "acc_uncertain": 0.5077,
+      "domain": "in"
+    },
+    "AES-T600": {
+      "accuracy": 0.3216,
+      "epistemic_mean": 0.000554,
+      "epistemic_std": 0.001103,
+      "entropy_mean": 0.6932,
+      "frac_uncertain": 0.4364,
+      "acc_certain": 0.3232,
+      "acc_uncertain": 0.3195,
+      "domain": "out"
+    },
+    "AES-T1100": {
+      "accuracy": 0.3481,
+      "epistemic_mean": 0.000446,
+      "epistemic_std": 0.000219,
+      "entropy_mean": 0.6933,
+      "frac_uncertain": 0.3463,
+      "acc_certain": 0.3347,
+      "acc_uncertain": 0.3733,
+      "domain": "out"
+    }
+  }
+}

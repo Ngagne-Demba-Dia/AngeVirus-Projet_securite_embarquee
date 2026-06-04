@@ -1,13 +1,24 @@
-# Données et modèles lourds
+# Données et modèles lourds (DVC)
 results/*.npz
+results/mlruns/
+results/*.csv
+results/*.parquet
+
+# Modèles et scalers — petits fichiers suivis pour le dashboard public
+# (exceptions explicites ci-dessous avec !)
 results/*.pt
 results/*.npy
-results/mlruns/
+!results/cnn1d_tiny_stm32.pt
+!results/scaler_ms_mean_AES-T800.npy
+!results/scaler_ms_scale_AES-T800.npy
+
+# Figures et métriques — suivies pour le dashboard public
 results/*.png
-results/*.csv
 results/*.json
 results/*.txt
-results/*.parquet
+!results/*.png
+!results/*.json
+!results/threat_registry.json
 
 # Docker
 __pycache__/

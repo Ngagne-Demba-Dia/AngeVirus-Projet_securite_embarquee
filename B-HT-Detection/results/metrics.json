@@ -1,0 +1,24 @@
+{
+  "XGBoost": {
+    "accuracy": 0.3045,
+    "f1_macro": 0.2642
+  },
+  "SVM_RBF": {
+    "accuracy": 0.3039,
+    "f1_macro": 0.2668
+  },
+  "CNN1D": {
+    "accuracy": 0.286,
+    "f1_macro": 0.2767
+  },
+  "RandomForest": {
+    "accuracy": 0.284,
+    "f1_macro": 0.2639
+  },
+  "_best": {
+    "model": "XGBoost",
+    "accuracy": 0.3045,
+    "train": "AES-T400",
+    "test": "AES-T500"
+  }
+}

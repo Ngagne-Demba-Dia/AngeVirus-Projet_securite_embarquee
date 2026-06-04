@@ -1,6 +1,6 @@
 # Dashboard Streamlit — détecteur Hardware Trojan (golden-free) + MLOps
 streamlit>=1.30
 numpy>=1.24
-matplotlib>=3.7        # importé par le client RPi réutilisé (figures)
-torch>=2.0             # inférence edge int8 + attaque PGD (démo live)
-# pyserial            # optionnel : uniquement si un vrai STM32 est branché
+# torch CPU-only (plus léger pour le déploiement cloud)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0

@@ -1,0 +1,26 @@
+{
+  "target": "AES-T700",
+  "pretrain_epochs": 200,
+  "n_unlabeled": 9600,
+  "temperature": 0.5,
+  "results": {
+    "5pct": {
+      "simclr": 0.6592,
+      "supervised": 0.6654,
+      "coral_ref": 0.5,
+      "gain_vs_coral": 0.1592
+    },
+    "10pct": {
+      "simclr": 0.6708,
+      "supervised": 0.6779,
+      "coral_ref": 0.6,
+      "gain_vs_coral": 0.0708
+    },
+    "20pct": {
+      "simclr": 0.6946,
+      "supervised": 0.6733,
+      "coral_ref": 0.677,
+      "gain_vs_coral": 0.0176
+    }
+  }
+}

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ht-detection-dashboard
+    env: python
+    plan: free
+    rootDir: B-HT-Detection
+    buildCommand: pip install -r dashboard/requirements.txt
+    startCommand: >
+      streamlit run dashboard/app.py
+      --server.port $PORT
+      --server.address 0.0.0.0
+      --server.headless true
+      --browser.gatherUsageStats false
+    envVars:
+      - key: PYTHONPATH
+        value: /opt/render/project/src/B-HT-Detection

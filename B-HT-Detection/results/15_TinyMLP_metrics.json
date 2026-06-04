@@ -1,0 +1,56 @@
+{
+  "architecture": "500\u219264\u219232\u21923",
+  "temperature": 4.0,
+  "alpha": 0.4,
+  "teacher_acc": 0.4411,
+  "student_acc_float": 0.549,
+  "student_acc_int8": 0.5456,
+  "quantization_loss": 0.0034,
+  "student_f1": 0.5463,
+  "acc_ratio": 1.2445,
+  "flash_bytes": 34435,
+  "flash_kb": 33,
+  "params": 34435,
+  "benchmarks": {
+    "AES-T400": {
+      "teacher": 0.3295,
+      "student": 0.4353,
+      "ratio": 1.3209
+    },
+    "AES-T500": {
+      "teacher": 0.3364,
+      "student": 0.4858,
+      "ratio": 1.4441
+    },
+    "AES-T600": {
+      "teacher": 0.3287,
+      "student": 0.4321,
+      "ratio": 1.3147
+    },
+    "AES-T700": {
+      "teacher": 0.666,
+      "student": 0.7478,
+      "ratio": 1.1229
+    },
+    "AES-T800": {
+      "teacher": 0.6902,
+      "student": 0.9572,
+      "ratio": 1.3869
+    },
+    "AES-T1100": {
+      "teacher": 0.3382,
+      "student": 0.439,
+      "ratio": 1.2982
+    }
+  },
+  "benchmarks_int8": {
+    "AES-T400": 0.4311,
+    "AES-T500": 0.4888,
+    "AES-T600": 0.4346,
+    "AES-T700": 0.7438,
+    "AES-T800": 0.9526,
+    "AES-T1100": 0.4392
+  },
+  "stm32_target": "Nucleo-F401RE (ARM Cortex-M4 @ 84MHz)",
+  "header_file": "../results/ht_detector_stm32.h"
+}

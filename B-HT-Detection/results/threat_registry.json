@@ -1,0 +1,537 @@
+{
+  "papers": {
+    "e5d2dca5b7b5": {
+      "id": "e5d2dca5b7b5",
+      "title": "New Windows on Heavy Dark Matter: Mineral Melt Modelling and X-Ray Readout for Muscovite Mica",
+      "authors": [
+        "Yilda Boukhtouchen",
+        "Joseph Bramante",
+        "Andrew Buchanan"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02579v1",
+      "abstract": "Muscovite mica is a translucent, layered silicate mineral whose basal cleavage, low radiogenic background, gigayear exposures, and demonstrated track retention over geological timescales make it a compelling target for rare particle searches. In this work, we develop a new framework for detecting heavy composite dark matter using muscovite mica as a paleodetector. We model melt track formation by heavy composite dark matter transiting through mica using a Sedov-Taylor thermal spike formalism, and validate the sub-micron regime with SRIM/TRIM simulations of nuclear recoil cascades, which also calibrate the phonon efficiency governing local energy deposition. We demonstrate a novel readout method using rapid X-ray fluorescence mapping with a copper backing contrast technique, capable of iden",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "bb5cd3c6732f": {
+      "id": "bb5cd3c6732f",
+      "title": "RoboDream: Compositional World Models for Scalable Robot Data Synthesis",
+      "authors": [
+        "Junjie Ye",
+        "Rong Xue",
+        "Basile Van Hoorick"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02577v1",
+      "abstract": "Scaling robot learning requires large-scale, diverse demonstrations, yet real-world data collection via teleoperation remains prohibitively expensive and time-consuming. While video diffusion models offer a promising avenue for data scaling, existing generative approaches are often limited to superficial visual augmentation, or suffer from embodiment hallucinations that yield physically infeasible motions. We present a generalizable embodiment-centric world model that achieves scalable data generation by synthesizing photorealistic demonstrations with novel objects, in novel scenes, and from novel viewpoints. Our approach anchors generation to rendered robot motion while conditioning on explicit scene and object priors, effectively decoupling trajectory execution from environment synthesis",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "1340018049ef": {
+      "id": "1340018049ef",
+      "title": "ProtoAda: Prototype-Guided Adaptive Adapter Expansion and Geometric Consolidation for Multimodal Continual Instruction Tuning",
+      "authors": [
+        "Yu-Cheng Shi",
+        "Zhen-Hao Xie",
+        "Jun-Tao Tang"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02576v1",
+      "abstract": "Multimodal Large Language Models (MLLMs) achieve strong performance through instruction tuning, but real-world deployment requires them to continually acquire new vision-language capabilities, making Multimodal Continual Instruction Tuning (MCIT) essential. To reduce inter-task interference and promote collaboration, recent methods often employ sparse architectures like Mixture of LoRA Experts with image-text similarity routing. However, tasks with distinct response structures could share highly similar visual-linguistic semantics and thus be wrongly routed to the same expert; image-text similarity alone is insufficient for reliable task assignment. For example, an expert in a grounding task requiring coordinate prediction may be biased toward producing short textual answers after learning",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "a743ae564132": {
+      "id": "a743ae564132",
+      "title": "Quantum Simulation of Nucleon-Antinucleon Interaction in Large-$N$ QCD$_2$ on an IBM Quantum Nighthawk Processor",
+      "authors": [
+        "Cameron V. Cogburn",
+        "Sebastian Grieninger",
+        "Dmitri E. Kharzeev"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02574v1",
+      "abstract": "We report a quantum simulation of the nucleon--antinucleon interaction in large-$N$ two-dimensional quantum chromodynamics (QCD$_2$) on the IBM Quantum Nighthawk processor. In the large-$N$ limit, QCD$_2$ admits a bosonized description in which baryons emerge as topological solitons (kinks) of an effective mesonic field theory, providing a controlled, nonperturbative framework for baryon--antibaryon dynamics.\n  We formulate the problem by mapping the continuum bosonized Hamiltonian to a spin-chain representation equivalent to an XXZ model with anisotropy set by the QCD parameters. In this mapping, nucleon and antinucleon states correspond to kink and antikink excitations, respectively, while their interaction is encoded in the spin correlations of the chain. Using Jordan--Wigner encoding, ",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "9ace95a5d524": {
+      "id": "9ace95a5d524",
+      "title": "VISReg: Variance-Invariance-Sketching Regularization for JEPA training",
+      "authors": [
+        "Haiyu Wu",
+        "Randall Balestriero",
+        "Morgan Levine"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02572v1",
+      "abstract": "Self-supervised learning methods prevent embedding collapse via modeling heuristics or explicit regularization of the embedding space. Among the latter, VICReg decomposes regularization into variance and covariance objectives, offering flexibility and interpretability. However, covariance captures only second-order statistics -- encouraging decorrelation but failing to enforce the full distributional shape needed for stable training. Sketching-based methods such as SIGReg address this by aligning embeddings to an isotropic Gaussian, but lack flexibility and suffer from vanishing gradients under collapse. We propose Variance-Invariance-Sketching Regularization (VISReg), which replaces covariance with a Sliced-Wasserstein-based sketching objective that enforces full distributional shape, whi",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "d41274a797b1": {
+      "id": "d41274a797b1",
+      "title": "Policy-based Foveated Imaging and Perception",
+      "authors": [
+        "Howard Xiao",
+        "Jan Ackermann",
+        "Boyang Deng"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02565v1",
+      "abstract": "Ultra-high-resolution image sensors offer the potential to capture fine spatial details critical for many visual perception tasks, but acquiring and processing all pixels at full resolution is often infeasible under realistic bandwidth, latency, and power constraints. Existing approaches address this challenge through acquisition strategies such as spatial or temporal downsampling, which irrevocably discard information before task relevance can be assessed. In this work, we introduce a real-time, predictive, and task-aware foveated imaging system that operates directly at image acquisition time. Leveraging emerging dual-stream sensor architectures, our method dynamically allocates limited pixel bandwidth to task-relevant regions of interest while maintaining a low-resolution global context",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "e513c994b9fd": {
+      "id": "e513c994b9fd",
+      "title": "IntraShuffler: A Privacy Preserving Framework for Heterogeneous DP Federated Learning",
+      "authors": [
+        "Farhin Farhad Riya",
+        "Olivera Kotevska",
+        "Jinyuan Stella Sun"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02563v1",
+      "abstract": "Heterogeneous Differential Privacy (HDP) in Federated Learning (FL) allows clients to select individual privacy budgets ($\\varepsilon_i$) according to institutional policies and data sensitivity. In practice, many HDP-FL systems employ $\\varepsilon$-aware server aggregation to improve model utility by re-weighting client updates according to their declared privacy budgets. However, gradient updates in FL retain structural patterns induced by non-independent and identically-distributed (non-IID) data, and these additional signals exposed by $\\varepsilon$-aware aggregation create new opportunities for inference by an honest-but-curious server. In this work, we first show that a server equipped with gradient denoising and surrogate modeling can mount a \\emph{Privacy Inference Attack} that inf",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "bba6926c6e2f": {
+      "id": "bba6926c6e2f",
+      "title": "Permissive Safety Through Trusted Inference: Verifiable Belief-Space Neural Safety Filters for Assured Interactive Robotics",
+      "authors": [
+        "Haimin Hu"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02562v1",
+      "abstract": "Autonomous robots that interact with people must make safe and efficient decisions under human-induced uncertainty, such as their preferences, goals, competency, and willingness to cooperate. Safety filters are a popular approach for ensuring safety in interactive robotics, since their modular design separates safety from performance, allowing robots to operate safely around people with minimal impact on task efficiency. While traditional safety filters typically operate only in the physical space, neglecting the robot's ability to learn and adapt online, the recently proposed belief-space safety filter (BeliefSF) reasons about robot safety in closed-loop with runtime inference that actively reduces the robot's uncertainty online, thereby reducing conservativeness in filtering. However, pr",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "2fcb662a0e6c": {
+      "id": "2fcb662a0e6c",
+      "title": "Probabilistic storyline attribution using machine learning",
+      "authors": [
+        "Frieder Loer",
+        "Maybritt Schillinger",
+        "Sebastian Sippel"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02550v1",
+      "abstract": "A fundamental goal in climate attribution is to estimate how forced climate change contributes to observed extreme weather events. The storyline attribution method compares an observed weather event, conditional on its atmospheric dynamic state (i.e., atmospheric circulation), in the current, 'factual' climate to an event with very similar circulation conditions in a hypothetical, 'counterfactual' climate. However, physical climate models cannot directly transfer these storyline counterfactuals across different climate forcing states. Statistical and machine learning techniques may overcome this limitation; yet, emulating circulation-conditional extreme events under different climate states is challenging. Here, we demonstrate distributional autoencoders (DAEs) as a versatile method for ge",
+      "source": "arXiv",
+      "relevance_score": 2,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "fe720ea69ccf": {
+      "id": "fe720ea69ccf",
+      "title": "Transferable Self-Harm Surveillance from Emergency Department Triage Notes Using an Evidence-Augmented Machine Learning Approach",
+      "authors": [
+        "Liuliu Chen",
+        "Gowri Rajaram",
+        "Eleanor Bailey"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02545v1",
+      "abstract": "Self-harm is a major public health concern, but current surveillance relying on hospital presentations is inadequate due to the low sensitivity of diagnostic codes. Emergency Department (ED) triage notes, recorded at the initial point of contact, provide a succinct summary of presentations and an opportunity to identify self-harm. We developed a three-stage approach, augmenting traditional machine learning with large language model-based screening and evidence extraction to detect self-harm in ED triage notes. We assessed model transferability across three Australian hospitals. Our approach showed AUPRCs of 0.887 +/- 0.016 and 0.884 +/- 0.012 during internal and external validation. Prospectively, it achieved AUPRC of 0.881 +/- 0.008 at the development site, and 0.879 +/- 0.012 and 0.816 +",
+      "source": "arXiv",
+      "relevance_score": 2,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "d40a7341c050": {
+      "id": "d40a7341c050",
+      "title": "Detecting Hardware Trojans: Deep Learning Solutions Combining PUF Metrics and Side-Channel Observations",
+      "authors": [
+        "Muskan Saraf",
+        "Akshay Kulkarni",
+        "Mohammed Y. Niamat"
+      ],
+      "published": "2025-02-25",
+      "url": "https://api.semanticscholar.org/graph/v1/paper/13fa1acea5f88d087ef6de49e4d67f04cb4f9280",
+      "abstract": "This study presents a deep learning-based framework for detecting hardware Trojans in integrated circuits (ICs) using Side-Channel Analysis (SCA) and Challenge-Response Pairs (CRPs) from Ring Oscillator Physical Unclonable Functions (ROPUFs). A Trojan-infected ROPUF is implemented on an Artix7 FPGA using VHDL in the AMD Xilinx Vivado Design Suite. Power, voltage, and current traces are collected using Keysight DC power analyzers under Trojan-active and Trojan- inactive states to assess the impact of Trojan circuits. The study employs advanced Deep Learning Algorithms (DLAs), including Convolutional Neural Networks (CNN), Recurrent Neural Networks (RNN), Long Short-Term Memory (LSTM), and Deep Clustering Networks (DCN), to analyze subtle variations in the collected datasets. Experimental re",
+      "source": "SemanticScholar",
+      "relevance_score": 7,
+      "category": "nouvelle_methode",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": true
+    },
+    "2d4a38545b2f": {
+      "id": "2d4a38545b2f",
+      "title": "Deep Learning-Based Hardware Trojan Detection via Dual-Path CNN and Markov Transition Field Representations",
+      "authors": [
+        "Arash Golabi",
+        "A. Erradi",
+        "Ahmed Bensaid"
+      ],
+      "published": "2025-11-04",
+      "url": "https://api.semanticscholar.org/graph/v1/paper/91b8821bab9ec249854727e44bd175f0cbdc1f73",
+      "abstract": "This paper introduces a dual-path deep learning framework specially designed for the efficient detection and classification of Hardware Trojans (HTs) through Side-Channel Analysis (SCA). Using Markov Transition Field (MTF) encoding and a reshaping strategy, the proposed method first converts side-channel time-series signals, including power traces, electromagnetic leaks, and timing data, into two different image-like formats. Detecting subtle Trojan activity requires these representations to capture intricate signal dynamics. Subsequently, each image is processed by a separate convolutional neural network (CNN) branch within the dual-path architecture, with each path optimized for extracting complementary features. To enhance classification performance, the outputs of both CNNs are fused v",
+      "source": "SemanticScholar",
+      "relevance_score": 7,
+      "category": "nouvelle_methode",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": true
+    },
+    "39fc37cc6750": {
+      "id": "39fc37cc6750",
+      "title": "A lightweight Hardware Trojan detection approach in the waveform diagram based on MobileViT and attention mechanism",
+      "authors": [
+        "Shouhong Chen",
+        "Guanxiang Qin",
+        "Ying Lu"
+      ],
+      "published": "2025-03-01",
+      "url": "https://api.semanticscholar.org/graph/v1/paper/854cd2882230a4cc5106273731c5b939b9ea4f5d",
+      "abstract": "",
+      "source": "SemanticScholar",
+      "relevance_score": 3,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": true
+    },
+    "e6dbed249a55": {
+      "id": "e6dbed249a55",
+      "title": "SkillHarm: Lifecycle-Aware Skill-Based Attacks via Automated Construction",
+      "authors": [
+        "Yuting Ning",
+        "Zhehao Zhang",
+        "Yash Kumar Lal"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02540v1",
+      "abstract": "Agent skills occupy a privileged position in the agent workflow, as agents are expected to implicitly follow and execute them, rendering third-party skills a vulnerable attack surface. Existing studies have revealed unsafe agent behaviors induced by skill-based attacks, but they primarily evaluate poisoned skills within a single task execution and enumerate harms through ad-hoc risk lists. To bridge these gaps, we introduce SkillHarm, a benchmark of skill-based attacks across the skill-use lifecycle, paired with a systematic taxonomy of skill-relevant risks. SkillHarm evaluates two attack scenarios: Fixed-Payload Poisoning (FPP), where a fixed poisoned skill package directly compromises any task session that invokes it, and Self-Mutating Poisoning (SMP), where an initially benign execution",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "108b070d0b78": {
+      "id": "108b070d0b78",
+      "title": "Iteris: Agentic Research Loops for Computational Mathematics",
+      "authors": [
+        "Leheng Chen",
+        "Zihao Liu",
+        "Wanyi He"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02484v1",
+      "abstract": "Recent advances in large language models and agentic AI systems have enabled significant progress in mathematical discovery, from solving competition problems to tackling research-level conjectures. However, open problems in computational mathematics have received comparatively less attention: research in this area often requires not only proofs but also numerical experimentation, adversarial constructions, and algorithm design. In this paper, we introduce an agentic research system, Iteris, designed for open problems in computational mathematics. We apply Iteris to two open problems from a recent Simons Workshop collection (arXiv:2602.05394). In these case studies, Iteris generated numerical evidence, constructions, and proof drafts that led, after expert review and correction, to verifie",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "fefbb91cf177": {
+      "id": "fefbb91cf177",
+      "title": "Bridging the Sim-to-Real Gap in Semiconductor Visual Program Synthesis via Input Binarization",
+      "authors": [
+        "Yusuke Ohtsubo",
+        "Kota Dohi",
+        "Koichiro Yawata"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02434v1",
+      "abstract": "Precise parametric control over circuit geometry is essential for semiconductor inspection, yet obtaining sufficient real training data remains costly. Although generative models such as diffusion models and Generative Adversarial Networks (GANs) can augment training data, they cannot guarantee the nanometer-scale geometric accuracy required for metrology tasks. We propose a visual program synthesis framework in which a Vision-Language Model (VLM) converts inspection images into editable Domain-Specific Language (DSL) code describing circuit geometries, enabling controlled generation of training data with exact parameter manipulation. Because the VLM is trained solely on synthetic DSL-rendered data, a domain gap arises when processing real Scanning Electron Microscope (SEM) images. We brid",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "f290d2f10b4e": {
+      "id": "f290d2f10b4e",
+      "title": "K-BrowseComp: A Web Browsing Agent Benchmark Grounded in Korean Contexts",
+      "authors": [
+        "Nahyun Lee",
+        "Dongkeun Yoon",
+        "Guijin Son"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02404v1",
+      "abstract": "Frontier model evaluations are shifting from foundational capabilities (e.g., instruction following and reasoning) toward compositional, agentic ones, but Korean agentic benchmarks remain scarce. We introduce K-BrowseComp, a web-browsing agent benchmark grounded in Korean contexts, consisting of 400 problems. The 300-problem K-BrowseComp-Verified subset is manually constructed and validated by native Korean speakers. On this subset, frontier LLMs, including GPT-5.5, DeepSeek-V4-Pro, and GLM-5.1, reach only 30.00--45.67\\%, a substantial drop from BrowseComp, while Korean LLMs released through Korea's Proprietary AI Foundation Model program obtain only 0.00--10.33\\%. We further construct a 100-problem synthetic split using hard few-shot exemplars and failure-mode-targeted generation to explo",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "269dc2321a5c": {
+      "id": "269dc2321a5c",
+      "title": "Shape changing identities for permuted-basement nonsymmetric Macdonald polynomials",
+      "authors": [
+        "Guilherme Zeus Dantas e Moura",
+        "Olya Mandelshtam"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02395v1",
+      "abstract": "Permuted-basement Macdonald polynomials $E_α^σ(\\mathbf{x};q,t)$ are nonsymmetric generalizations of symmetric Macdonald polynomials that form a basis for the polynomial ring $\\mathbb{Q}(q,t)[\\mathbf{x}]$ for each fixed $σ$. There are combinatorial formulas for them as generating functions over composition-shaped non-attacking fillings. In this extended abstract, we bijectively prove identities for the relationship between $E_α^σ$, $E_α^{σs_i}$, $E_{s_iα}^σ$, and $E_{s_iα}^{σs_i}$. These identities correspond to two combinatorial operations on non-attacking fillings: (1) swapping adjacent entries in the basement, generalizing a result of Alexandersson (2019), and (2) swapping adjacent parts in the shape, which yields a straightening rule for expanding $E_α^σ$ in the polynomials $\\{E_{s_iα}^",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "f26183707dd0": {
+      "id": "f26183707dd0",
+      "title": "Honey, I Shrunk the Arc de Triomphe!",
+      "authors": [
+        "Yuanbo Xiangli",
+        "Hanyu Chen",
+        "Xueqing Tsang"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02379v1",
+      "abstract": "Metric scale monocular geometry estimation has seen significant progress through large-scale data aggregation, yet current foundation models suffer from a persistent ''scale-collapse'' phenomenon: distant landmarks and vast landscapes are metrically underestimated. We hypothesize that this performance gap stems from a training data bottleneck, where existing metric-scale datasets are hardware-constrained to homogenous vehicle-captured LiDAR or short-range indoor scans, or consist of synthetic data that lacks the semantic complexity of the physical world. To bridge this gap, we curate a new metrically-grounded, in-the-wild dataset that we call MetricScenes, gathered from a variety of sources including Internet photo collections and stereo imagery. We estimate camera poses and initial depth ",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "3e32ee3bef3e": {
+      "id": "3e32ee3bef3e",
+      "title": "Lossy Microwave Linear Analog Computer (MiLAC) for Future MIMO: Learning-based Architecture Designs for Spectral and Energy Efficiency Maximization",
+      "authors": [
+        "Binggui Zhou",
+        "Bruno Clerckx"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02369v1",
+      "abstract": "Microwave linear analog computers (MiLACs) offer a transformative paradigm for future multiple-input multiple-output (MIMO) systems by shifting complex signal processing into the analog domain, thereby significantly reducing computational complexity, radio-frequency chains, and analog-digital converters, while speeding up computation. However, the practical deployment of MiLACs is severely constrained by the inherent hardware losses of the tunable admittance components (TACs) interconnecting MiLAC ports, which introduce severe inter-stream interference and fundamentally limit the spectral efficiency (SE) of the system. In addition, while denser architectures offer greater spatial degrees of freedom to mitigate inter-stream interference, the cumulative hardware losses and power consumption ",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "7539664a8e2f": {
+      "id": "7539664a8e2f",
+      "title": "Certified Closed-Loop Control for Packet Networks: A Compositional Certification Framework",
+      "authors": [
+        "Muhammad Bilal",
+        "Jon Crowcroft",
+        "Xiaolong Xu"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02368v1",
+      "abstract": "Packet networks are controlled dynamical systems with discontinuities, delayed observations, and partial state information. Adaptive or learning-driven proposers can improve performance, but an unsafe proposal may still cause starvation, tail-delay spikes, or unstable queue behaviour. This paper treats packet-network control as an executed-action certification problem. A certified operator sits between any proposer and the dataplane. At each control tick, the proposer emits an arbitrary candidate action $\\tilde u(t)$. The operator either projects it to an executable action $u(t)$ that satisfies a configuration-compiled certificate, or reports INFEASIBLE and executes an always-defined fallback with quantified slack. The certificate also exports an auditable envelope $\\bar z(t)$ for downstre",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "dc3c4361099f": {
+      "id": "dc3c4361099f",
+      "title": "Robust hardware Trojan detection leveraging dual-domain features and stacked ensemble learning",
+      "authors": [
+        "Sefatun-Noor Puspa",
+        "Abyad Enan",
+        "Reek Majumder"
+      ],
+      "published": "2026-01-23",
+      "url": "https://api.semanticscholar.org/graph/v1/paper/6cef85232467d193b1830dceeee29789410bd442",
+      "abstract": "",
+      "source": "SemanticScholar",
+      "relevance_score": 3,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": true
+    },
+    "6c2a668c7e46": {
+      "id": "6c2a668c7e46",
+      "title": "Uncertainty-Aware Unimodal and Multimodal Learning for Evolving Hardware Trojan Detection",
+      "authors": [
+        "Rahul Vishwakarma",
+        "Amin Rezaei"
+      ],
+      "published": "2025-02-26",
+      "url": "https://api.semanticscholar.org/graph/v1/paper/8b918c78bce31de2f7dfa17d9c104d8dbbc4ee23",
+      "abstract": "",
+      "source": "SemanticScholar",
+      "relevance_score": 3,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": true
+    },
+    "527d217c9a4a": {
+      "id": "527d217c9a4a",
+      "title": "From Zero to Hero: Training-Free Custom Concept Spawning in World Models",
+      "authors": [
+        "Kiymet Akdemir",
+        "Pinar Yanardag"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02575v1",
+      "abstract": "Autoregressive world models have emerged as a powerful paradigm for interactive video generation, allowing users to navigate dynamically generated environments through actions. These models are typically conditioned on a text prompt and/or a single reference frame, from which the entire world is generated. Yet the moment the user navigates beyond what is visible in that frame, the unseen regions are populated by the base model's priors, with no mechanism for the user to specify what should appear and where. This is a fundamental limitation for applications such as gaming, interactive storytelling, and simulation, where controllable scene composition is essential. We refer to this missing capability as concept spawning; introducing a user-specified visual concept into a world model, analogo",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "f0ec407dfb27": {
+      "id": "f0ec407dfb27",
+      "title": "Conjugacy Problem for Dehn Twists of Free Products of Free Abelian Groups",
+      "authors": [
+        "Amir Y. Weiss Behar",
+        "Chris Karpinski",
+        "Bratati Som"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02558v1",
+      "abstract": "We show solubility of the conjugacy problem for Dehn twist automorphisms of finitely generated free products of free abelian groups.",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "dc1c1f7b916c": {
+      "id": "dc1c1f7b916c",
+      "title": "Modeling Depth Ambiguity: A Mixture-Density Representation for Flying-Point-Free Depth Estimation",
+      "authors": [
+        "Siyuan Bian",
+        "Congrong Xu",
+        "Jun Gao"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02552v1",
+      "abstract": "Despite advances in depth estimation, flying points remain a persistent failure mode: near object boundaries, depth estimators often predict spurious 3D points in the empty space between foreground and background surfaces. We trace this artifact to a standard modeling choice: assigning each pixel a single depth hypothesis. At boundaries, a pixel can straddle a foreground and a background surface, so its true depth is ambiguous between the two. A model that predicts a single depth cannot keep both possibilities, so training instead pulls the prediction toward an intermediate depth that lies on neither surface. We address this with MDA, a mixture-density representation that lets the model predict multiple depth hypotheses and their associated probabilities for each pixel. Near boundaries, di",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "b545f91aad02": {
+      "id": "b545f91aad02",
+      "title": "SN-WER: Script-Normalized WER for Multi-Script Indic ASR Evaluation",
+      "authors": [
+        "Priyaranjan Pattnayak"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02548v1",
+      "abstract": "Word Error Rate (WER) is the dominant metric for automatic speech recognition (ASR), but it can overestimate errors when references and hypotheses encode the same words in different scripts. This issue is common in multilingual settings where ASR models may emit romanized text. We propose Script-Normalized WER (SN-WER), a training-free, evaluation-only scoring method that transliterates both reference and hypothesis text into a language-specific canonical script before computing WER. We evaluate SN-WER on 5 Indic languages, 2 datasets, and 3 ASR models. On curated FLEURS data, SN-WER reduces inflated model gaps by up to 12%, while on noisier Common Voice data the reductions are smaller or inconsistent, indicating genuine recognition weaknesses rather than only script mismatch. Controlled s",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "91e51ccab614": {
+      "id": "91e51ccab614",
+      "title": "SimSD: Simple Speculative Decoding in Diffusion Language Models",
+      "authors": [
+        "Junxia Cui",
+        "Haotian Ye",
+        "Runchu Tian"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02544v1",
+      "abstract": "Diffusion large language models (dLLMs) have recently emerged as a promising alternative to autoregressive (AR) LLMs, offering faster inference through parallel or blockwise decoding. However, their masked language modeling formulation remains incompatible with standard token-level speculative decoding, one of the most effective acceleration techniques for AR models. In AR decoding, the causal mask preserves temporally valid token-level contexts, enabling a target model to verify multiple drafted tokens in a single forward pass. In contrast, dLLMs rely on mask tokens and bidirectional attention, causing the effective context to change across denoising steps and preventing direct token-level speculative verification. To bridge this gap, we propose a simple but effective speculative decoding",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "39e9634ec4bb": {
+      "id": "39e9634ec4bb",
+      "title": "A Guide to Higher-Order Homophily",
+      "authors": [
+        "Moritz Laber",
+        "Brennan Klein"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02537v1",
+      "abstract": "Homophily, the overrepresentation of interactions among similar individuals, and heterophily, the elevated prevalence of interactions among dissimilar ones, are frequently observed mixing patterns in social networks. As hypergraphs are increasingly used to represent social systems, a higher-order perspective on homophily and heterophily becomes ever more relevant. Here, we provide two complementary perspectives on this problem: First, we survey measures that can be used to quantify homophily (or heterophily) in hypergraphs -- emphasizing conceptual differences to existing pairwise measures -- and explain each measure through in-depth examples. Second, we provide an overview of hypergraph models for higher-order mixing patterns, distinguishing several model families with distinct use cases.",
+      "source": "arXiv",
+      "relevance_score": 0,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    },
+    "85485391b934": {
+      "id": "85485391b934",
+      "title": "Improving Combined Detection and Classification of TEM Defects via Mask-Conditioned Latent Diffusion Augmentation",
+      "authors": [
+        "Ni Li",
+        "Nuohao Liu",
+        "Ryan Jacobs"
+      ],
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02532v1",
+      "abstract": "Analyzing microstructural defects in transmission electron microscopy (TEM) images, particularly in irradiated metal alloys, is often limited by the availability of high-quality, labeled data. To address this, we introduce a generative data augmentation approach using a mask-conditioned latent diffusion model (LDM) for synthesizing realistic TEM images with controllable, automatically labeled multi-class defect masks. Without requiring manual annotations for generation, our method enables the creation of synthetic image-mask pairs by sampling distributions learned from experimental masks. These generated data were used to augment small experimental datasets of varying sizes (10, 50, and 100 labeled experimental images) to train a Mask Regional Convolutional Neural Network (R-CNN) model for",
+      "source": "arXiv",
+      "relevance_score": 2,
+      "category": "hors_sujet",
+      "is_dataset": false,
+      "is_attack": false,
+      "alert": false
+    }
+  },
+  "last_scan": "2026-06-02T15:29:14.012200",
+  "alerts": []
+}

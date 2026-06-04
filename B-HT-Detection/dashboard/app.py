@@ -50,7 +50,7 @@ def img(name, **kw):
     """Affiche une figure si elle existe, sinon une note discrète."""
     p = RESULTS / name
     if p.exists():
-        st.image(str(p), use_container_width=True, **kw)
+        st.image(str(p), width='stretch', **kw)
     else:
         st.caption(f"_(figure manquante : {name})_")
 
@@ -210,7 +210,7 @@ elif page == "🔬 Démo Live":
     raw = X[idx]
     st.caption(f"Trace #{idx} — vérité terrain : **{LED[y[idx]]} {LABELS[y[idx]]}**")
 
-    st.line_chart(raw, height=160, use_container_width=True)
+    st.line_chart(raw, height=160, width='stretch')
 
     # ── Inférence propre ──
     st.subheader("Verdict des détecteurs (trace intacte)")

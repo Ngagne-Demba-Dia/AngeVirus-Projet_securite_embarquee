@@ -119,6 +119,11 @@ class BatchRequest(BaseModel):
     traces: list[list[float]] = Field(..., max_length=256,
                                        description="Lot de traces (max 256)")
 
+class FeatureRequest(BaseModel):
+    features: list[float] = Field(..., min_length=100, max_length=2000,
+                                   description="Features déjà extraites (500), envoyées par l'edge")
+    benchmark: Optional[str] = Field(None, description="Benchmark d'origine (informatif)")
+
 class PredictResponse(BaseModel):
     label:      int
     state:      str          # TrojanDisabled / TrojanEnabled / TrojanTriggered
@@ -176,6 +181,31 @@ def _infer(samples: list[float]) -> dict:
     trace = np.array(samples, dtype=np.float32)
     feat  = extract_features(trace, window=cfg["window_size"], n_fft=cfg["n_fft"])
 
+    X = state["scaler"].transform(feat.reshape(1, -1))
+    X_t = torch.FloatTensor(X)
+
+    with torch.no_grad():
+        logits = state["model"](X_t)
+        probs  = torch.softmax(logits, dim=1).numpy()[0]
+
+    label = int(probs.argmax())
+    state["n_predict"] += 1
+
+    return {
+        "label":      label,
+        "state":      LABEL_NAMES[label],
+        "risk":       LABEL_RISK[LABEL_NAMES[label]],
+        "confidence": float(probs[label]),
+    }
+
+
+def _infer_features(features: list[float]) -> dict:
+    """Inference sur features DÉJÀ extraites (envoyées par l'edge STM32/RPi).
+    Évite de transmettre la trace brute (2500 pts) — l'edge envoie 500 features."""
+    if state["model"] is None:
+        raise HTTPException(status_code=503, detail="Modèle non chargé")
+
+    feat = np.array(features, dtype=np.float32)
     X = state["scaler"].transform(feat.reshape(1, -1))
     X_t = torch.FloatTensor(X)
 
@@ -278,6 +308,24 @@ def predict(req: TraceRequest):
 
     if result["risk"] == "ALERT":
         log.warning(f"ALERTE HT détecté! conf={result['confidence']:.3f}")
+
+    return result
+
+
+@app.post("/predict/features", response_model=PredictResponse, tags=["Inference"])
+def predict_features(req: FeatureRequest):
+    """
+    Classifier à partir de features DÉJÀ extraites (flux edge → cloud).
+    - Input  : 500 features (extraites sur le RPi/STM32)
+    - Output : verdict du modèle cloud AT_T800
+    Permet de comparer le verdict edge (Tiny MLP) au verdict cloud (modèle complet).
+    """
+    t0 = time.perf_counter()
+    result = _infer_features(req.features)
+    result["latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
+
+    if result["risk"] == "ALERT":
+        log.warning(f"ALERTE HT détecté (features)! conf={result['confidence']:.3f}")
 
     return result
 

@@ -395,15 +395,49 @@ elif page == "📊 Résultats ML":
 
     with t[6]:
         st.subheader("Déploiement — client Raspberry Pi 3-niveaux")
-        st.markdown("**Scénario A** — détection d'activation : un flux temporel sain bascule "
-                    "en Trojan déclenché, l'alarme se lève avec ~1 trace de latence.")
-        img("16_rpi_scenarioA_timeline.png", caption="Scénario A — détection d'activation")
-        st.markdown("**Scénario B** — évasion adversariale : l'edge est contournable "
-                    "(alarme rétrogradée) mais le cloud robuste préserve l'alerte.")
-        img("16_rpi_scenarioB_masquage.png", caption="Scénario B — Edge vs Cloud sous PGD")
+
+        # ── Résultats hardware live ──────────────────────────────────────────
+        metrics_path = RESULTS / "16_rpi_metrics.json"
+        hw_col1, hw_col2 = st.columns([3, 1])
+        with hw_col1:
+            if metrics_path.exists():
+                import datetime
+                mtime = datetime.datetime.fromtimestamp(metrics_path.stat().st_mtime)
+                st.success(f"✅ Résultats hardware disponibles — dernier run : **{mtime:%Y-%m-%d %H:%M:%S}**")
+            else:
+                st.info("⏳ En attente des résultats hardware (lance le client RPi avec --stm32)")
+        with hw_col2:
+            if st.button("🔄 Rafraîchir"):
+                st.cache_data.clear()
+                st.rerun()
+
         d = load_json("16_rpi_metrics.json") or {}
         if d:
-            with st.expander("Métriques brutes (16_rpi_metrics.json)"):
+            sa = d.get("scenario_A", {})
+            sb = d.get("scenario_B", {})
+            if sa:
+                st.markdown("#### Scénario A — Détection d'activation (matériel réel)")
+                c = st.columns(4)
+                c[0].metric("Alarme levée", f"t = {sa.get('alarm_t', '?')}", "trace d'activation")
+                c[1].metric("Latence détection", f"{sa.get('latency_traces', '?')} trace(s)")
+                c[2].metric("Faux positifs", str(sa.get('false_positives', '?')))
+                c[3].metric("Trojan détecté", f"{sa.get('trojan_detection_rate', 0):.0%}")
+            if sb:
+                st.markdown("#### Scénario B — Évasion adversariale PGD (matériel réel)")
+                cont = sb.get("contournement_alarme_at_eps", {})
+                evas = sb.get("evasion_totale_at_eps", {})
+                c = st.columns(len(cont))
+                for col, (k, v) in zip(c, cont.items()):
+                    col.metric(k.replace("\n", " "), f"Contournement {v:.1%}",
+                               f"Évasion totale {evas.get(k, 0):.1%}")
+
+        st.markdown("---")
+        st.markdown("**Scénario A** — flux temporel sain → Trojan déclenché → alarme LED STM32")
+        img("16_rpi_scenarioA_timeline.png", caption="Scénario A — timeline détection")
+        st.markdown("**Scénario B** — PGD ε=0.2 : edge contournable (ALERT→WARNING), cloud robuste")
+        img("16_rpi_scenarioB_masquage.png", caption="Scénario B — Edge vs Cloud sous PGD")
+        if d:
+            with st.expander("Métriques brutes JSON"):
                 st.json(d)
 
 

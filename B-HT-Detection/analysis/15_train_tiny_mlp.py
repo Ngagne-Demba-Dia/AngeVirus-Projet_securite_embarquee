@@ -197,6 +197,7 @@ def export_stm32_header(model: TinyMLP, scaler: StandardScaler,
         "#pragma once",
         "#include <stdint.h>",
         "#include <string.h>",
+        "#include <math.h>     /* expf() pour la softmax */",
         "",
         "/* ── Dimensions ─────────────────────────────────────────────── */",
         f"#define HT_N_INPUT     {N_INPUT}",
@@ -268,25 +269,33 @@ def export_stm32_header(model: TinyMLP, scaler: StandardScaler,
             "",
         ]
 
-    # BN parameters (pour fusion lors de l'inférence)
+    # BN parameters — exportés en tableaux float COMPLETS (appliqués à l'inférence)
+    # BatchNorm inference : y = factor * (Wx + b) + bias_fused
+    #   factor     = gamma / sqrt(var + eps)
+    #   bias_fused = beta - running_mean * factor
     lines += [
-        "/* ── BatchNorm parameters (fusionnés dans les biais) ────────── */",
+        "/* ── BatchNorm parameters (appliqués dans ht_predict) ───────── */",
+        "/* Inference BN : y = factor * (Wx + b) + bias_fused, puis ReLU  */",
     ]
-    for bn_name, dim in [("bn1", HIDDEN1), ("bn2", HIDDEN2)]:
-        gamma = sd[f"{bn_name}.weight"].numpy()
-        beta  = sd[f"{bn_name}.bias"].numpy()
-        mean  = sd[f"{bn_name}.running_mean"].numpy()
-        var   = sd[f"{bn_name}.running_var"].numpy()
-        # Facteur de fusion : gamma / sqrt(var + eps)
-        factor = gamma / np.sqrt(var + 1e-5)
+    for bn_name, dim, fac_name, bias_name in [
+        ("bn1", HIDDEN1, "BN1_FACTOR", "BN1_BIAS"),
+        ("bn2", HIDDEN2, "BN2_FACTOR", "BN2_BIAS"),
+    ]:
+        gamma = sd[f"{bn_name}.weight"].cpu().numpy()
+        beta  = sd[f"{bn_name}.bias"].cpu().numpy()
+        mean  = sd[f"{bn_name}.running_mean"].cpu().numpy()
+        var   = sd[f"{bn_name}.running_var"].cpu().numpy()
+        factor     = gamma / np.sqrt(var + 1e-5)
         bias_fused = beta - mean * factor
-        f_str = ", ".join(f"{v:.6f}f" for v in factor[:8]) + ", ..."
-        b_str = ", ".join(f"{v:.6f}f" for v in bias_fused[:8]) + ", ..."
-        lines += [
-            f"/* {bn_name} : factor[{dim}], bias_fused[{dim}] */",
-            f"/* factor (8 premiers) : {f_str} */",
-            f"/* bias_fused (8 premiers) : {b_str} */",
-        ]
+
+        for arr_name, arr in [(fac_name, factor), (bias_name, bias_fused)]:
+            lines.append(f"static const float {arr_name}[{dim}] = {{")
+            for i in range(0, len(arr), chunk):
+                vals = ", ".join(f"{v:.6f}f" for v in arr[i:i+chunk])
+                lines.append(f"    {vals},")
+            lines[-1] = lines[-1].rstrip(",")
+            lines.append("};")
+        lines.append("")
 
     # Fonction d'inférence inline
     lines += [
@@ -298,22 +307,24 @@ def export_stm32_header(model: TinyMLP, scaler: StandardScaler,
         f"    for (int i = 0; i < {N_INPUT}; i++)",
         "        x0[i] = (features[i] - HT_SCALER_MEAN[i]) / HT_SCALER_SCALE[i];",
         "",
-        f"    /* Couche 1 : {N_INPUT} → {HIDDEN1} (ReLU) */",
+        f"    /* Couche 1 : {N_INPUT} → {HIDDEN1} (Linear + BatchNorm + ReLU) */",
         f"    float h1[{HIDDEN1}];",
         f"    for (int i = 0; i < {HIDDEN1}; i++) {{",
         "        float s = B1[i] * B1_SCALE;",
         f"        for (int j = 0; j < {N_INPUT}; j++)",
         "            s += W1[i][j] * W1_SCALE * x0[j];",
-        "        h1[i] = s > 0.0f ? s : 0.0f;  /* ReLU */",
+        "        s = BN1_FACTOR[i] * s + BN1_BIAS[i];   /* BatchNorm */",
+        "        h1[i] = s > 0.0f ? s : 0.0f;           /* ReLU */",
         "    }",
         "",
-        f"    /* Couche 2 : {HIDDEN1} → {HIDDEN2} (ReLU) */",
+        f"    /* Couche 2 : {HIDDEN1} → {HIDDEN2} (Linear + BatchNorm + ReLU) */",
         f"    float h2[{HIDDEN2}];",
         f"    for (int i = 0; i < {HIDDEN2}; i++) {{",
         "        float s = B2[i] * B2_SCALE;",
         f"        for (int j = 0; j < {HIDDEN1}; j++)",
         "            s += W2[i][j] * W2_SCALE * h1[j];",
-        "        h2[i] = s > 0.0f ? s : 0.0f;  /* ReLU */",
+        "        s = BN2_FACTOR[i] * s + BN2_BIAS[i];   /* BatchNorm */",
+        "        h2[i] = s > 0.0f ? s : 0.0f;           /* ReLU */",
         "    }",
         "",
         f"    /* Couche 3 : {HIDDEN2} → {N_CLASSES} (logits) */",
@@ -359,6 +370,44 @@ def export_stm32_header(model: TinyMLP, scaler: StandardScaler,
     size_kb = path.stat().st_size / 1024
     print(f"Header C STM32 généré : {path.name}  ({size_kb:.1f} KB)")
     return path
+
+
+def simulate_int8_inference(model: TinyMLP, X_norm: np.ndarray) -> np.ndarray:
+    """
+    Réplique EXACTEMENT le code C de ht_predict() avec poids int8 + BatchNorm.
+    Permet de connaître la vraie accuracy embarquée (vs accuracy float).
+    X_norm : features DÉJÀ normalisées (le scaler est appliqué hors device ici).
+    """
+    sd = model.state_dict()
+
+    def quant(t):
+        t = t.float()
+        scale = max(abs(t.min().item()), abs(t.max().item())) / 127.0
+        scale = scale if scale != 0 else 1e-8
+        q = (t / scale).clamp(-127, 127).round().cpu().numpy()
+        return q, scale
+
+    W1q, W1s = quant(sd["fc1.weight"]); b1q, b1s = quant(sd["fc1.bias"])
+    W2q, W2s = quant(sd["fc2.weight"]); b2q, b2s = quant(sd["fc2.bias"])
+    W3q, W3s = quant(sd["fc3.weight"]); b3q, b3s = quant(sd["fc3.bias"])
+
+    def bn_params(name):
+        g = sd[f"{name}.weight"].cpu().numpy(); be = sd[f"{name}.bias"].cpu().numpy()
+        m = sd[f"{name}.running_mean"].cpu().numpy(); v = sd[f"{name}.running_var"].cpu().numpy()
+        fac = g / np.sqrt(v + 1e-5)
+        return fac, be - m * fac
+    bn1_f, bn1_b = bn_params("bn1")
+    bn2_f, bn2_b = bn_params("bn2")
+
+    # Forward int8 (déquantisé en float comme le fait le C)
+    h1 = (b1q * b1s) + X_norm @ (W1q * W1s).T   # (N, 64)
+    h1 = bn1_f * h1 + bn1_b
+    h1 = np.maximum(h1, 0.0)
+    h2 = (b2q * b2s) + h1 @ (W2q * W2s).T        # (N, 32)
+    h2 = bn2_f * h2 + bn2_b
+    h2 = np.maximum(h2, 0.0)
+    logits = (b3q * b3s) + h2 @ (W3q * W3s).T    # (N, 3)
+    return logits.argmax(1)
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -555,18 +604,41 @@ if __name__ == "__main__":
     student_cpu.eval()
     header_path = export_stm32_header(student_cpu, scaler, results_dir, acc_student)
 
+    # ── Validation int8 : accuracy RÉELLE sur STM32 (réplique du code C) ───────
+    print("\n=== VALIDATION INT8 (accuracy embarquée réelle vs float) ===")
+    preds_int8 = simulate_int8_inference(student_cpu, X_te)
+    acc_int8   = float(accuracy_score(y_te, preds_int8))
+    print(f"  Accuracy float32 (PyTorch) : {acc_student:.4f}")
+    print(f"  Accuracy int8   (STM32)    : {acc_int8:.4f}")
+    print(f"  Perte quantisation         : {acc_student - acc_int8:+.4f}")
+    # Par benchmark en int8
+    int8_bm = {}
+    for bm in all_bms:
+        p = results_dir / f"features_{bm}.npz"
+        if not p.exists():
+            continue
+        d  = np.load(p)
+        Xb = scaler.transform(d["X"].astype(np.float32))
+        yb = d["y"].astype(np.int64)
+        acc_b = float(accuracy_score(yb, simulate_int8_inference(student_cpu, Xb)))
+        int8_bm[bm] = round(acc_b, 4)
+        print(f"    {bm:15} int8 acc = {acc_b:.4f}")
+
     # ── Métriques JSON ─────────────────────────────────────────────────────────
     metrics = {
         "architecture": f"{N_INPUT}→{HIDDEN1}→{HIDDEN2}→{N_CLASSES}",
         "temperature": TEMPERATURE, "alpha": ALPHA,
         "teacher_acc": round(acc_teacher, 4),
-        "student_acc": round(acc_student, 4),
+        "student_acc_float": round(acc_student, 4),
+        "student_acc_int8":  round(acc_int8, 4),
+        "quantization_loss": round(acc_student - acc_int8, 4),
         "student_f1":  round(f1_student, 4),
         "acc_ratio":   round(acc_student / acc_teacher, 4),
         "flash_bytes": student.flash_size_bytes(),
         "flash_kb":    student.flash_size_bytes() // 1024,
         "params":      student.count_params(),
-        "benchmarks":  bm_results,
+        "benchmarks":      bm_results,
+        "benchmarks_int8": int8_bm,
         "stm32_target": "Nucleo-F401RE (ARM Cortex-M4 @ 84MHz)",
         "header_file": str(header_path),
     }
